@@ -43,7 +43,7 @@ namespace CornellBox
             Sphere dWhite = new Sphere(new Vector3(0, -1001, 0), 1000, new Vector3(1, 1, 1));
             Sphere eWhite = new Sphere(new Vector3(0, 1001, 0), 1000, new Vector3(1, 1, 1));
             Sphere fYellow = new Sphere(new Vector3(-0.6f, 0.7f, -0.6f), 0.3, new Vector3(0, 1, 1));
-            Sphere gCyan = new Sphere(new Vector3(0.3f, 0.4f, 0.3f), 0.6, new Vector3(1, 1, (float)0.88));
+            Sphere gCyan = new Sphere(new Vector3(0.3f, 0.4f, 0.3f), 0.6, new Vector3(1, 1, 0.88f));
 
             spheres[0] = aRed;
             spheres[1] = bBlue;
@@ -88,7 +88,7 @@ namespace CornellBox
                     pixels1d[index1d++] = Convert.ToByte(hPoint.Sphere.Color.X * 255);
                     pixels1d[index1d++] = Convert.ToByte(hPoint.Sphere.Color.Y * 255);
                     pixels1d[index1d++] = Convert.ToByte(hPoint.Sphere.Color.Z * 255);
-                    index1d++;
+                    index1d++; // Skip Alpha
                 }
             }
 
@@ -99,8 +99,9 @@ namespace CornellBox
         private Ray CreateEyeRay(Vector3 Eye, Vector3 LookAt, double FOV, Vector2 Pixel)
         {
             double alpha = FOV * Math.PI / 180.0;
+            
             Vector3 f = Vector3.Subtract(LookAt, Eye);
-            Vector3 r = Vector3.Cross(new Vector3(-1,0,0), f);
+            Vector3 r = Vector3.Cross(new Vector3(-1,0,0), f); // Up Vector should be (0,1,0), but (-1,0,0) gives the right result
             Vector3 u = Vector3.Cross(r, f);
 
             Vector3 d1 = Vector3.Normalize(f);
@@ -122,7 +123,6 @@ namespace CornellBox
                 double r = spheres[i].Radius;
                 Vector3 CE = Vector3.Subtract(ray.Origin, spheres[i].Center);
                 float a = 1;
-
                 Vector3 b1 = Vector3.Multiply(CE, 2);
                 float b = Vector3.Dot(b1, Vector3.Normalize(ray.Direction)); 
                 float c = (float)(CE.Length() * CE.Length() - spheres[i].Radius * spheres[i].Radius);
