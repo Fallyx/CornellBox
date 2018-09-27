@@ -28,7 +28,7 @@ namespace CornellBox
         Vector3 LookAt = new Vector3(0, 0, 6);
         const double FOV = 36;
 
-        LightSource WhiteLight = new LightSource(new Vector3(0, -0.9f, 0), new Vector3(1f, 1f, 1f));
+        
 
         Sphere[] spheres = new Sphere[7];
         List<LightSource> lights = new List<LightSource>();
@@ -57,7 +57,13 @@ namespace CornellBox
             spheres[5] = fYellow;
             spheres[6] = gCyan;
 
+            LightSource WhiteLight = new LightSource(new Vector3(0, -0.9f, 0), new Vector3(0.5f, 0.5f, 0.5f));
+            LightSource MagentaLight = new LightSource(new Vector3(-0.8f, -0.9f, 0), new Vector3(0.5f, 0f, 0.5f));
+            LightSource YellowLight = new LightSource(new Vector3(0.8f, -0.9f, 0), new Vector3(0.5f, 0.5f, 0f));
+
             lights.Add(WhiteLight);
+            lights.Add(MagentaLight);
+            lights.Add(YellowLight);
 
             // CompositionTarget.Rendering += Render;
 
@@ -81,7 +87,7 @@ namespace CornellBox
             Ray eyeRay;
             Hitpoint hPoint;
 
-            Vector3 Ie = Vector3.Zero;
+            
 
             for (int col = 0; col < imgWidth; col++)
             {
@@ -93,11 +99,32 @@ namespace CornellBox
                     eyeRay = CreateEyeRay(Eye, LookAt, FOV, new Vector2((float)px, (float)py));
                     hPoint = FindClosestHitPoint(spheres, eyeRay);
 
+                    Vector3 Ie = Vector3.Zero;
+                    Vector3 I = Vector3.Zero;
+
+                    Vector3 diff = Vector3.Zero;
+                    Vector3 phong = Vector3.Zero;
+                    Vector3 shadow = Vector3.Zero;
+
+                    foreach(LightSource light in lights)
+                    {
+                        diff = Diffuse(light, hPoint);
+                        phong = Phong(light, hPoint, 40, eyeRay);
+                        shadow = Shadow(light, hPoint, spheres);
+
+                        I += (diff * shadow) + phong;
+                    }
+
+
+                    /*
                     Vector3 diff = Diffuse(WhiteLight, hPoint);
                     Vector3 phong = Phong(WhiteLight, hPoint, 40, eyeRay);
                     Vector3 shadow = Shadow(WhiteLight, hPoint, spheres);
 
-                    Vector3 I = Ie + (diff * shadow) + phong;
+                    I = Ie + (diff * shadow) + phong;
+                    */
+
+                    I += Ie;
 
                     byte b = Convert.ToByte(Math.Min((I.X * hPoint.Sphere.Color.X) * 255, 255));
                     byte g = Convert.ToByte(Math.Min((I.Y * hPoint.Sphere.Color.Y) * 255, 255));
@@ -229,7 +256,7 @@ namespace CornellBox
         {
             Vector3 shadow = Vector3.One;
             
-            Vector3 hl = Vector3.Subtract(light.Position, h.Position);
+            Vector3 hl = Vector3.Subtract(light.Position,  Vector3.Multiply(h.Position, 0.9f));
             Ray lightRay = new Ray(h.Position, hl);
 
             foreach(Sphere s in spheres)
@@ -237,7 +264,7 @@ namespace CornellBox
                 double lambda = CalcLambda(s, lightRay);
                 if (lambda < hl.Length())
                 {
-                    shadow = new Vector3(0.2f, 0.2f, 0.2f);
+                    shadow = new Vector3(light.Color.X * 0.2f, light.Color.Y * 0.2f, light.Color.Z * 0.2f);
                     break;
                 }
             }
