@@ -58,6 +58,7 @@
       <SubType>Designer</SubType>
     </ApplicationDefinition>
     <Compile Include="Hitpoint.cs" />
+    <Compile Include="LightSource.cs" />
     <Compile Include="Ray.cs" />
     <Compile Include="Sphere.cs" />
     <Page Include="MainWindow.xaml">

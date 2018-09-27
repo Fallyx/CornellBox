@@ -21,13 +21,17 @@ namespace CornellBox
     /// </summary>
     public partial class MainWindow : Window
     {
-        const int imgWidth = 771;
-        const int imgHeight = 771;
+        const int imgWidth = 770;
+        const int imgHeight = 770;
 
         Vector3 Eye = new Vector3(0, 0, -4);
         Vector3 LookAt = new Vector3(0, 0, 6);
         const double FOV = 36;
+        LightSource WhiteLight = new LightSource(new Vector3(1f,1f,-25f), new Vector3(1,1,1));
+        //LightSource WhiteLight = new LightSource(new Vector3(0, 0.9f, 0), new Vector3(1, 1, 1));
+
         Sphere[] spheres = new Sphere[7];
+        List<LightSource> lights = new List<LightSource>();
 
         int stride = 4 * imgWidth;
 
@@ -52,6 +56,8 @@ namespace CornellBox
             spheres[4] = eWhite;
             spheres[5] = fYellow;
             spheres[6] = gCyan;
+
+            lights.Add(WhiteLight);
 
             // CompositionTarget.Rendering += Render;
 
@@ -79,15 +85,24 @@ namespace CornellBox
             {
                 for (int row = 0; row < imgHeight; row++)
                 {
-                    double px = col / (imgWidth - 1D) * 2 - 1;
-                    double py = row / (imgHeight - 1D) * 2 - 1;
+                    double px = (col / (imgWidth - 1d)) * 2 - 1;
+                    double py = (row / (imgHeight - 1d)) * 2 - 1;
 
                     eyeRay = CreateEyeRay(Eye, LookAt, FOV, new Vector2((float)px, (float)py));
                     hPoint = FindClosestHitPoint(spheres, eyeRay);
 
+                    Vector3 diff = Diffuse(WhiteLight, hPoint);
+
+                    /*
                     pixels1d[index1d++] = Convert.ToByte(hPoint.Sphere.Color.X * 255);
                     pixels1d[index1d++] = Convert.ToByte(hPoint.Sphere.Color.Y * 255);
-                    pixels1d[index1d++] = Convert.ToByte(hPoint.Sphere.Color.Z * 255);
+                    pixels1d[index1d++] = Convert.ToByte(hPoint.Sphere.Color.Z * 255); 
+                    */                  
+                    
+                    pixels1d[index1d++] = Convert.ToByte(diff.X * 255);
+                    pixels1d[index1d++] = Convert.ToByte(diff.Y * 255);
+                    pixels1d[index1d++] = Convert.ToByte(diff.Z * 255);
+                    
                     index1d++; // Skip Alpha
                 }
             }
@@ -100,13 +115,13 @@ namespace CornellBox
         {
             double alpha = FOV * Math.PI / 180.0;
             
-            Vector3 f = Vector3.Subtract(LookAt, Eye);
-            Vector3 r = Vector3.Cross(new Vector3(-1,0,0), f); // Up Vector should be (0,1,0), but (-1,0,0) gives the right result
-            Vector3 u = Vector3.Cross(r, f);
+            Vector3 f = Vector3.Normalize(Vector3.Subtract(LookAt, Eye));
+            Vector3 r = Vector3.Normalize(Vector3.Cross(f, new Vector3(1, 0, 0))); // Up Vector should be (0,1,0), but (1,0,0) gives the right result
+            Vector3 u = Vector3.Normalize(Vector3.Cross(r, f));
 
-            Vector3 d1 = Vector3.Normalize(f);
-            Vector3 d2 = Vector3.Multiply(Vector3.Normalize(r), Pixel.X * (float)Math.Tan(alpha / 2));
-            Vector3 d3 = Vector3.Multiply(Vector3.Normalize(u), Pixel.Y * (float)Math.Tan(alpha / 2));
+            Vector3 d1 = f;
+            Vector3 d2 = Vector3.Multiply(r, Pixel.X * (float)Math.Tan(alpha / 2));
+            Vector3 d3 = Vector3.Multiply(u, Pixel.Y * (float)Math.Tan(alpha / 2));
 
             Vector3 d = Vector3.Add(d1, Vector3.Add(d2, d3));
 
@@ -162,5 +177,31 @@ namespace CornellBox
             Vector3 pos = new Vector3((float)(Eye.X + closestHit * ray.Origin.X), (float)(Eye.Y + closestHit * ray.Origin.Y), (float)(Eye.Z + closestHit * ray.Origin.Z));
             return new Hitpoint(pos, closestSphere);
         }
+
+        private Vector3 Diffuse(LightSource light, Hitpoint h)
+        {
+            Vector3 diff = Vector3.Zero;
+
+            Vector3 n = Vector3.Normalize(Vector3.Subtract(h.Position, h.Sphere.Center));
+            Vector3 l = Vector3.Normalize(Vector3.Subtract(light.Center, h.Position));
+            float nL = Vector3.Dot(n, l);
+
+            if (nL >= 0)
+            {
+                Vector3 ilm = Vector3.Multiply(light.Color, h.Sphere.Color);
+                diff = Vector3.Multiply(ilm, nL); 
+            }
+
+            return diff;
+        }
+
+        /*
+        private Vector3 Phong (Vector3 Diffuse, Vector3 light)
+        {
+            Vector3 l = Vector3.Normalize(Vector3.Subtract(light.Center, h.Position));
+            //Vector3 s = 
+            return Vector3.Zero;
+        }
+        */
     }
 }
