@@ -27,8 +27,8 @@ namespace CornellBox
         Vector3 Eye = new Vector3(0, 0, -4);
         Vector3 LookAt = new Vector3(0, 0, 6);
         const double FOV = 36;
-        LightSource WhiteLight = new LightSource(new Vector3(1f,1f,-25f), new Vector3(1,1,1));
-        //LightSource WhiteLight = new LightSource(new Vector3(0, 0.9f, 0), new Vector3(1, 1, 1));
+        //LightSource WhiteLight = new LightSource(new Vector3(1f,1f,-25f), new Vector3(1,1,1));
+        LightSource WhiteLight = new LightSource(new Vector3(0, -0.9f, 0), new Vector3(1, 1, 1));
 
         Sphere[] spheres = new Sphere[7];
         List<LightSource> lights = new List<LightSource>();
@@ -144,8 +144,8 @@ namespace CornellBox
 
                 if (b * b > 4 * a * c)
                 {
-                    double lambda1 = (-b + Math.Sqrt(b * b - 4 * a * c)) / 2 * a;
-                    double lambda2 = (-b - Math.Sqrt(b * b - 4 * a * c)) / 2 * a;
+                    double lambda1 = (-b + Math.Sqrt(b * b - 4 * a * c)) / (2 * a);
+                    double lambda2 = (-b - Math.Sqrt(b * b - 4 * a * c)) / (2 * a);
 
                     if(lambda1 >= 0 && lambda2 >= 0)
                     {
@@ -174,7 +174,7 @@ namespace CornellBox
                 }
             }
 
-            Vector3 pos = new Vector3((float)(Eye.X + closestHit * ray.Origin.X), (float)(Eye.Y + closestHit * ray.Origin.Y), (float)(Eye.Z + closestHit * ray.Origin.Z));
+            Vector3 pos = new Vector3((float)(Eye.X + closestHit * ray.Direction.X), (float)(Eye.Y + closestHit * ray.Direction.Y), (float)(Eye.Z + closestHit * ray.Direction.Z));
             return new Hitpoint(pos, closestSphere);
         }
 
@@ -183,7 +183,7 @@ namespace CornellBox
             Vector3 diff = Vector3.Zero;
 
             Vector3 n = Vector3.Normalize(Vector3.Subtract(h.Position, h.Sphere.Center));
-            Vector3 l = Vector3.Normalize(Vector3.Subtract(light.Center, h.Position));
+            Vector3 l = Vector3.Normalize(Vector3.Subtract(light.Position, h.Position));
             float nL = Vector3.Dot(n, l);
 
             if (nL >= 0)

@@ -9,18 +9,16 @@ namespace CornellBox
 {
     class LightSource
     {
-        private Vector3 center;
-        private double radius;
+        private Vector3 position;
         private Vector3 color;
 
-        public LightSource(Vector3 center, Vector3 color)
+        public LightSource(Vector3 position, Vector3 color)
         {
-            this.center = center;
+            this.position = position;
             this.color = color;
         }
 
-        public Vector3 Center { get => center; set => center = value; }
-        public double Radius { get => radius; set => radius = value; }
+        public Vector3 Position { get => position; set => position = value; }
         public Vector3 Color { get => color; set => color = value; }
     }
 }
