@@ -46,8 +46,8 @@ namespace CornellBox
             Sphere cWhite = new Sphere(new Vector3(0, 0, 1001), 1000, new Vector3(1, 1, 1));
             Sphere dWhite = new Sphere(new Vector3(0, -1001, 0), 1000, new Vector3(1, 1, 1));
             Sphere eWhite = new Sphere(new Vector3(0, 1001, 0), 1000, new Vector3(1, 1, 1));
-            Sphere fYellow = new Sphere(new Vector3(-0.6f, 0.7f, -0.6f), 0.3, new Vector3(0, 1, 1));
-            Sphere gCyan = new Sphere(new Vector3(0.3f, 0.4f, 0.3f), 0.6, new Vector3(1, 1, 0.88f));
+            Sphere fYellow = new Sphere(new Vector3(-0.6f, 0.7f, -0.6f), 0.3, new Vector3(0, 1, 1), 0.5f);
+            Sphere gCyan = new Sphere(new Vector3(0.3f, 0.4f, 0.3f), 0.6, new Vector3(1, 1, 0.88f), 0.5f);
 
             spheres[0] = aRed;
             spheres[1] = bBlue;
@@ -105,6 +105,7 @@ namespace CornellBox
                     Vector3 diff = Vector3.Zero;
                     Vector3 phong = Vector3.Zero;
                     Vector3 shadow = Vector3.Zero;
+                    Vector3 refl = Vector3.Zero;
 
                     foreach(LightSource light in lights)
                     {
@@ -115,7 +116,9 @@ namespace CornellBox
                         I += (diff * shadow) + phong;
                     }
 
-                    I += Ie;
+                    refl = Reflection(hPoint, eyeRay, 1);
+
+                    I += Ie + refl;
 
                     byte b = Convert.ToByte(Math.Min((I.X * hPoint.Sphere.Color.X) * 255, 255));
                     byte g = Convert.ToByte(Math.Min((I.Y * hPoint.Sphere.Color.Y) * 255, 255));
@@ -281,6 +284,29 @@ namespace CornellBox
 
             return shorterLambda > 0 ? shorterLambda : double.MaxValue;
 
+        }
+
+        private Vector3 Reflection(Hitpoint h, Ray ray, int maxLevel)
+        {
+            Vector3 reflection = Vector3.Zero;
+
+            if (h.Sphere.Reflection > 0)
+            {
+                Vector3 EH = Vector3.Subtract(h.Position, ray.Origin);
+                Vector3 n = Vector3.Subtract(h.Position, h.Sphere.Center);
+
+                Vector3 r = Vector3.Reflect(EH, Vector3.Normalize(n));
+
+                if (maxLevel > 0)
+                {
+                    maxLevel -= 1;
+                    reflection = Reflection(h, ray, maxLevel) * h.Sphere.Reflection;
+                }
+            }
+
+
+
+            return reflection;
         }
     }
 }
