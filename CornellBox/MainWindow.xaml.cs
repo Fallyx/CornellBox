@@ -85,8 +85,6 @@ namespace CornellBox
             byte[] pixels1d = new byte[imgHeight * imgWidth * 4];
             int index1d = 0;
             Ray eyeRay;
-            Hitpoint hPoint;
-
             
 
             for (int col = 0; col < imgWidth; col++)
@@ -97,32 +95,12 @@ namespace CornellBox
                     double py = (row / (imgHeight - 1d)) * 2 - 1;
 
                     eyeRay = CreateEyeRay(Eye, LookAt, FOV, new Vector2((float)px, (float)py));
-                    hPoint = FindClosestHitPoint(spheres, eyeRay);
 
-                    Vector3 Ie = Vector3.Zero;
-                    Vector3 I = Vector3.Zero;
+                    Vector3 color = CalcColor(eyeRay, 2);
 
-                    Vector3 diff = Vector3.Zero;
-                    Vector3 phong = Vector3.Zero;
-                    Vector3 shadow = Vector3.Zero;
-                    Vector3 refl = Vector3.Zero;
-
-                    foreach(LightSource light in lights)
-                    {
-                        diff = Diffuse(light, hPoint);
-                        phong = Phong(light, hPoint, 40, eyeRay);
-                        shadow = Shadow(light, hPoint, spheres);
-
-                        I += (diff * shadow) + phong;
-                    }
-
-                    refl = Reflection(hPoint, eyeRay, 1);
-
-                    I += Ie + refl;
-
-                    byte b = Convert.ToByte(Math.Min((I.X * hPoint.Sphere.Color.X) * 255, 255));
-                    byte g = Convert.ToByte(Math.Min((I.Y * hPoint.Sphere.Color.Y) * 255, 255));
-                    byte r = Convert.ToByte(Math.Min((I.Z * hPoint.Sphere.Color.Z) * 255, 255));
+                    byte b = (byte)Math.Min(color.X * 255, 255);
+                    byte g = (byte)Math.Min(color.Y * 255, 255);
+                    byte r = (byte)Math.Min(color.Z * 255, 255);
 
                     pixels1d[index1d++] = b;
                     pixels1d[index1d++] = g;
@@ -286,25 +264,49 @@ namespace CornellBox
 
         }
 
+        private Vector3 CalcColor(Ray ray, int recursionCount = 0)
+        {
+            Hitpoint hPoint = FindClosestHitPoint(spheres, ray);
+
+            Vector3 Ie = Vector3.Zero;
+            Vector3 I = Vector3.Zero;
+
+            Vector3 diff = Vector3.Zero;
+            Vector3 phong = Vector3.Zero;
+            Vector3 shadow = Vector3.Zero;
+            Vector3 refl = Vector3.Zero;
+
+            foreach (LightSource light in lights)
+            {
+                diff = Diffuse(light, hPoint);
+                phong = Phong(light, hPoint, 40, ray);
+                shadow = Shadow(light, hPoint, spheres);
+
+                I += (diff * shadow) + phong;
+            }
+
+            refl = Reflection(hPoint, ray, recursionCount);
+
+            I += Ie + refl;
+
+            return Vector3.Multiply(I, hPoint.Sphere.Color);
+        }
+
         private Vector3 Reflection(Hitpoint h, Ray ray, int maxLevel)
         {
             Vector3 reflection = Vector3.Zero;
 
-            if (h.Sphere.Reflection > 0)
+            if (h.Sphere.Reflection > 0 && maxLevel > 0)
             {
                 Vector3 EH = Vector3.Subtract(h.Position, ray.Origin);
                 Vector3 n = Vector3.Subtract(h.Position, h.Sphere.Center);
 
                 Vector3 r = Vector3.Reflect(EH, Vector3.Normalize(n));
 
-                if (maxLevel > 0)
-                {
-                    maxLevel -= 1;
-                    reflection = Reflection(h, ray, maxLevel) * h.Sphere.Reflection;
-                }
+                Ray reflectRay = new Ray(h.Position, r);
+
+                reflection = CalcColor(reflectRay, maxLevel - 1) * h.Sphere.Reflection;
             }
-
-
 
             return reflection;
         }
