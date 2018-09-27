@@ -115,15 +115,6 @@ namespace CornellBox
                         I += (diff * shadow) + phong;
                     }
 
-
-                    /*
-                    Vector3 diff = Diffuse(WhiteLight, hPoint);
-                    Vector3 phong = Phong(WhiteLight, hPoint, 40, eyeRay);
-                    Vector3 shadow = Shadow(WhiteLight, hPoint, spheres);
-
-                    I = Ie + (diff * shadow) + phong;
-                    */
-
                     I += Ie;
 
                     byte b = Convert.ToByte(Math.Min((I.X * hPoint.Sphere.Color.X) * 255, 255));
