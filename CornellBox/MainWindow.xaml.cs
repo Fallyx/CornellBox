@@ -62,8 +62,8 @@ namespace CornellBox
             LightSource YellowLight = new LightSource(new Vector3(0.8f, -0.9f, 0), new Vector3(0.5f, 0.5f, 0f));
 
             lights.Add(WhiteLight);
-            lights.Add(MagentaLight);
-            lights.Add(YellowLight);
+            //lights.Add(MagentaLight);
+            //lights.Add(YellowLight);
 
             // CompositionTarget.Rendering += Render;
 
@@ -264,7 +264,7 @@ namespace CornellBox
 
         }
 
-        private Vector3 CalcColor(Ray ray, int recursionCount = 0)
+        private Vector3 CalcColor(Ray ray, int recursionCount)
         {
             Hitpoint hPoint = FindClosestHitPoint(spheres, ray);
 
@@ -303,7 +303,7 @@ namespace CornellBox
 
                 Vector3 r = Vector3.Reflect(EH, Vector3.Normalize(n));
 
-                Ray reflectRay = new Ray(h.Position, r);
+                Ray reflectRay = new Ray(h.Position + r * 1.1f, Vector3.Normalize(r) * 1.1f);
 
                 reflection = CalcColor(reflectRay, maxLevel - 1) * h.Sphere.Reflection;
             }
