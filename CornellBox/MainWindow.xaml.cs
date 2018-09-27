@@ -95,8 +95,9 @@ namespace CornellBox
 
                     Vector3 diff = Diffuse(WhiteLight, hPoint);
                     Vector3 phong = Phong(WhiteLight, hPoint, 40, eyeRay);
+                    Vector3 shadow = Shadow(WhiteLight, hPoint, spheres);
 
-                    Vector3 I = Ie + diff + phong;
+                    Vector3 I = Ie + (diff * shadow) + phong;
 
                     byte b = Convert.ToByte(Math.Min((I.X * hPoint.Sphere.Color.X) * 255, 255));
                     byte g = Convert.ToByte(Math.Min((I.Y * hPoint.Sphere.Color.Y) * 255, 255));
@@ -222,6 +223,46 @@ namespace CornellBox
             }
 
             return phong;
+        }
+
+        private Vector3 Shadow(LightSource light, Hitpoint h, Sphere[] spheres)
+        {
+            Vector3 shadow = Vector3.One;
+            
+            Vector3 hl = Vector3.Subtract(light.Position, h.Position);
+            Ray lightRay = new Ray(h.Position, hl);
+
+            foreach(Sphere s in spheres)
+            {
+                double lambda = CalcLambda(s, lightRay);
+                if (lambda < hl.Length())
+                {
+                    shadow = new Vector3(0.2f, 0.2f, 0.2f);
+                    break;
+                }
+            }
+    
+            return shadow;
+        }
+
+        private double CalcLambda(Sphere sphere, Ray ray)
+        {
+            Vector3 sr = Vector3.Subtract(ray.Origin, sphere.Center);
+            float a = 1;
+            float b = 2 * Vector3.Dot(Vector3.Normalize(ray.Direction), sr);
+            float c = (float)(sr.Length() * sr.Length() - sphere.Radius * sphere.Radius);
+
+            float determin = b * b - 4 * a * c;
+
+            if (determin < 0) return double.MaxValue;
+
+            double lambda1 = (-b + Math.Sqrt(b * b - 4 * a * c)) / (2 * a);
+            double lambda2 = (-b - Math.Sqrt(b * b - 4 * a * c)) / (2 * a);
+
+            double shorterLambda = (float)Math.Min(lambda1, lambda2);
+
+            return shorterLambda > 0 ? shorterLambda : double.MaxValue;
+
         }
     }
 }
