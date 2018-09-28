@@ -123,7 +123,6 @@ namespace CornellBox
 
             for (int i = 0; i < spheres.Length; i++)
             { 
-                double r = spheres[i].Radius;
                 Vector3 CE = Vector3.Subtract(ray.Origin, spheres[i].Center);
                 float a = 1;
                 Vector3 b1 = Vector3.Multiply(CE, 2);
@@ -235,7 +234,7 @@ namespace CornellBox
         {
             Vector3 sr = Vector3.Subtract(ray.Origin, sphere.Center);
             float a = 1;
-            float b = 2 * Vector3.Dot(Vector3.Normalize(ray.Direction), sr);
+            float b = 2 * Vector3.Dot(sr, Vector3.Normalize(ray.Direction));
             float c = (float)(sr.Length() * sr.Length() - sphere.Radius * sphere.Radius);
 
             float determin = b * b - 4 * a * c;
@@ -298,6 +297,32 @@ namespace CornellBox
             }
 
             return reflection;
+        }
+
+        private double CalcLambda(float a, float b, float c)
+        {
+            float determin = b * b - 4 * a * c;
+
+            if (determin < 0) return double.MaxValue;
+
+            double lambda1 = (-b + Math.Sqrt(b * b - 4 * a * c)) / (2 * a);
+            double lambda2 = (-b - Math.Sqrt(b * b - 4 * a * c)) / (2 * a);
+
+            double shorterLambda = (float)Math.Min(lambda1, lambda2);
+
+            return shorterLambda > 0 ? shorterLambda : double.MaxValue;
+        }
+
+        private float[] MidnightVars(Sphere sphere, Ray ray)
+        {
+            float[] mVars = new float[3];
+
+            Vector3 sr = Vector3.Subtract(ray.Origin, sphere.Center);
+            mVars[0] = 1; // a
+            mVars[1] = 2 * Vector3.Dot(sr, Vector3.Normalize(ray.Direction)); // b
+            mVars[2] = (float)(sr.Length() * sr.Length() - sphere.Radius * sphere.Radius); // c
+
+            return mVars;
         }
     }
 }
