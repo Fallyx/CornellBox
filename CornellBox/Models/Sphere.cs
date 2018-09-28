@@ -11,15 +11,15 @@ namespace CornellBox.Models
 
         public Sphere(Vector3 center, double radius, Vector3 color, float reflection = 0)
         {
-            this.center = center;
-            this.radius = radius;
-            this.color = color;
-            this.reflection = reflection;
+            Center = center;
+            Radius = radius;
+            Color = color;
+            Reflection = reflection;
         }
 
-        public Vector3 Center { get => center; set => center = value; }
-        public double Radius { get => radius; set => radius = value; }
-        public Vector3 Color { get => color; set => color = value; }
-        public float Reflection { get => reflection; set => reflection = value; }
+        public Vector3 Center { get => center; private set => center = value; }
+        public double Radius { get => radius; private set => radius = value; }
+        public Vector3 Color { get => color; private set => color = value; }
+        public float Reflection { get => reflection; private set => reflection = value; }
     }
 }

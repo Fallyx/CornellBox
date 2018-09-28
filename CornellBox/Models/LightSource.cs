@@ -9,11 +9,11 @@ namespace CornellBox.Models
 
         public LightSource(Vector3 position, Vector3 color)
         {
-            this.position = position;
-            this.color = color;
+            Position = position;
+            Color = color;
         }
 
-        public Vector3 Position { get => position; set => position = value; }
-        public Vector3 Color { get => color; set => color = value; }
+        public Vector3 Position { get => position; private set => position = value; }
+        public Vector3 Color { get => color; private set => color = value; }
     }
 }

@@ -10,12 +10,12 @@ namespace CornellBox.Models
 
         public Ray(Vector3 origin, Vector3 direction)
         {
-            this.origin = origin;
-            this.direction = direction;
+            Origin = origin;
+            Direction = direction;
         }
 
-        public Vector3 Origin { get => origin; set => origin = value; }
-        public Vector3 Direction { get => direction; set => direction = value; }
+        public Vector3 Origin { get => origin; private set => origin = value; }
+        public Vector3 Direction { get => direction; private set => direction = value; }
 
         public static Ray CreateEyeRay(Vector3 Eye, Vector3 LookAt, double FOV, Vector2 Pixel)
         {

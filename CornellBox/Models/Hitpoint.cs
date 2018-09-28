@@ -13,14 +13,14 @@ namespace CornellBox.Models
 
         public Hitpoint(Vector3 position, Sphere sphere)
         {
-            this.position = position;
-            this.sphere = sphere;
-            this.normal = Vector3.Normalize(Vector3.Subtract(position, sphere.Center));
+            Position = position;
+            Sphere = sphere;
+            Normal = Vector3.Normalize(Vector3.Subtract(position, sphere.Center));
         }
 
-        public Vector3 Position { get => position; set => position = value; }
-        public Sphere Sphere { get => sphere; set => sphere = value; }
-        public Vector3 Normal { get => normal; set => normal = value; }
+        public Vector3 Position { get => position; private set => position = value; }
+        public Sphere Sphere { get => sphere; private set => sphere = value; }
+        public Vector3 Normal { get => normal; private set => normal = value; }
 
         public static Hitpoint FindClosestHitPoint(List<Sphere> spheres, Ray ray)
         {
