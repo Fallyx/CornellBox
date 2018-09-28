@@ -61,6 +61,7 @@
     <Compile Include="Models\LightSource.cs" />
     <Compile Include="Helpers\Midnight.cs" />
     <Compile Include="Models\Ray.cs" />
+    <Compile Include="Models\RayTracing.cs" />
     <Compile Include="Scenes\CornellBoxScene.cs" />
     <Compile Include="Models\Sphere.cs" />
     <Page Include="MainWindow.xaml">

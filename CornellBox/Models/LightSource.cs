@@ -1,8 +1,8 @@
 ﻿using System.Numerics;
 
-namespace CornellBox
+namespace CornellBox.Models
 {
-    class LightSource
+    public class LightSource
     {
         private Vector3 position;
         private Vector3 color;

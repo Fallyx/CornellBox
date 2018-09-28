@@ -1,8 +1,8 @@
 ﻿using System.Numerics;
 
-namespace CornellBox
+namespace CornellBox.Models
 {
-    class Sphere
+    public class Sphere
     {
         private Vector3 center;
         private double radius;

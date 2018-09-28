@@ -1,15 +1,12 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Numerics;
+using CornellBox.Models;
 
 namespace CornellBox.Helpers
 {
     class Midnight
     {
-        public float[] MidnightVars(Sphere sphere, Ray ray)
+        public static float[] MidnightVars(Sphere sphere, Ray ray)
         {
             float[] mVars = new float[3];
 
@@ -21,7 +18,7 @@ namespace CornellBox.Helpers
             return mVars;
         }
 
-        private double CalcLambda(float a, float b, float c)
+        public static double CalcLambda(float a, float b, float c)
         {
             float determin = b * b - 4 * a * c;
 

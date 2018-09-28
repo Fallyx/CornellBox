@@ -1,12 +1,13 @@
 ﻿using System.Windows.Media;
 using System.Collections.Generic;
 using System.Numerics;
+using CornellBox.Models;
 
 namespace CornellBox.Scenes
 {
-    class CornellBoxScene
+    public class CornellBoxScene
     {
-        public List<Sphere> InitSphere()
+        public static List<Sphere> InitSphere()
         {
             List<Sphere> spheres = new List<Sphere>();
 
@@ -29,7 +30,7 @@ namespace CornellBox.Scenes
             return spheres;
         }
 
-        public List<LightSource> InitLight(bool singleLight)
+        public static List<LightSource> InitLight(bool singleLight)
         {
             List<LightSource> lights = new List<LightSource>();
             LightSource WhiteLight;
@@ -40,7 +41,6 @@ namespace CornellBox.Scenes
                 lights.Add(WhiteLight);
 
                 return lights;
-
             }
 
             WhiteLight = new LightSource(new Vector3(0, -0.9f, 0), new Vector3(0.5f, 0.5f, 0.5f));
@@ -53,13 +53,14 @@ namespace CornellBox.Scenes
 
             return lights;
         }
-
-        /*
-        public byte[] PixelArray (int imgHeight, int imgWidth, int stride, Vector3 Eye, Vector3 LookAt, double FOV)
+        
+        public static byte[] PixelArray (int imgHeight, int imgWidth, int stride, List<Sphere> spheres, List<LightSource> lights, Vector3 Eye, Vector3 LookAt, double FOV)
         {
             byte[] pixels = new byte[imgHeight * imgWidth * stride];
             int index = 0;
             Ray eyeRay;
+
+            RayTracing rayTracing = new RayTracing(spheres, lights);
 
             for (int col = 0; col < imgWidth; col++)
             {
@@ -68,9 +69,10 @@ namespace CornellBox.Scenes
                     double px = (col / (imgWidth - 1d)) * 2 - 1;
                     double py = (row / (imgHeight - 1d)) * 2 - 1;
 
-                    eyeRay = CreateEyeRay(Eye, LookAt, FOV, new Vector2((float)px, (float)py));
+                    eyeRay = Ray.CreateEyeRay(Eye, LookAt, FOV, new Vector2((float)px, (float)py));
 
-                    Vector3 color = CalcColor(eyeRay, 1);
+                    Vector3 color = rayTracing.CalcColor(eyeRay, 1);
+
                     Color c = Color.FromScRgb(1, color.Z, color.Y, color.X);
 
                     pixels[index++] = c.B;
@@ -83,6 +85,5 @@ namespace CornellBox.Scenes
 
             return pixels;
         }
-        */
     }
 }
