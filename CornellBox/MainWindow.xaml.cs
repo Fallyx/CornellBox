@@ -262,6 +262,11 @@ namespace CornellBox
         {
             Hitpoint hPoint = FindClosestHitPoint(spheres, ray);
 
+            if(hPoint.Sphere == null)
+            {
+                return Vector3.Zero;
+            }
+
             Vector3 Ie = Vector3.Zero;
             Vector3 I = Vector3.Zero;
             Vector3 diff = Vector3.Zero;
@@ -294,9 +299,9 @@ namespace CornellBox
                 Vector3 EH = Vector3.Subtract(h.Position, ray.Origin);
                 Vector3 n = Vector3.Subtract(h.Position, h.Sphere.Center);
 
-                Vector3 r = Vector3.Reflect(ray.Direction, n);
+                Vector3 r = Vector3.Reflect(Vector3.Normalize(EH), Vector3.Normalize(n));
 
-                Ray reflectRay = new Ray(h.Position + n * 0.1f, Vector3.Normalize(r) * 0.001f);
+                Ray reflectRay = new Ray(h.Position + n * 0.001f, Vector3.Normalize(r));
 
                 reflection = CalcColor(reflectRay, recursionCount - 1) * h.Sphere.Reflection;
             }
