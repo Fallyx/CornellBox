@@ -93,7 +93,7 @@ namespace CornellBox
 
                     eyeRay = CreateEyeRay(Eye, LookAt, FOV, new Vector2((float)px, (float)py));
 
-                    Vector3 color = CalcColor(eyeRay, 2);
+                    Vector3 color = CalcColor(eyeRay, 1);
                     Color c = Color.FromScRgb(1, color.Z, color.Y, color.X);
 
                     pixels1d[index1d++] = c.B;
@@ -171,7 +171,7 @@ namespace CornellBox
                 }
             }
 
-            Vector3 pos = new Vector3((float)(Eye.X + closestHit * ray.Direction.X), (float)(Eye.Y + closestHit * ray.Direction.Y), (float)(Eye.Z + closestHit * ray.Direction.Z));
+            Vector3 pos = new Vector3((float)(ray.Origin.X + closestHit * ray.Direction.X), (float)(ray.Origin.Y + closestHit * ray.Direction.Y), (float)(ray.Origin.Z + closestHit * ray.Direction.Z));
             return new Hitpoint(pos, closestSphere);
         }
 
@@ -222,9 +222,10 @@ namespace CornellBox
         {
             Vector3 shadow = Vector3.One;
 
-            //Vector3 hl = Vector3.Subtract(light.Position, Vector3.Multiply(h.Position, 0.9f));
             Vector3 hl = Vector3.Subtract(light.Position, h.Position);
-            Ray lightRay = new Ray(h.Position, Vector3.Normalize(hl) * 0.001f);
+            Vector3 n = Vector3.Normalize(Vector3.Subtract(h.Position, h.Sphere.Center));
+
+            Ray lightRay = new Ray(h.Position + n * 0.001f, Vector3.Normalize(hl));
 
             foreach(Sphere s in spheres)
             {
@@ -298,10 +299,9 @@ namespace CornellBox
             {
                 Vector3 EH = Vector3.Subtract(h.Position, ray.Origin);
                 Vector3 n = Vector3.Subtract(h.Position, h.Sphere.Center);
-
                 Vector3 r = Vector3.Reflect(Vector3.Normalize(EH), Vector3.Normalize(n));
 
-                Ray reflectRay = new Ray(h.Position + r * 0.001f, Vector3.Normalize(r));
+                Ray reflectRay = new Ray(h.Position + n * 0.001f, Vector3.Normalize(r));
 
                 reflection = CalcColor(reflectRay, recursionCount - 1) * h.Sphere.Reflection;
             }
