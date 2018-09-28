@@ -43,8 +43,8 @@ namespace CornellBox
             Sphere cWhite = new Sphere(new Vector3(0, 0, 1001), 1000, new Vector3(1, 1, 1));
             Sphere dWhite = new Sphere(new Vector3(0, -1001, 0), 1000, new Vector3(1, 1, 1));
             Sphere eWhite = new Sphere(new Vector3(0, 1001, 0), 1000, new Vector3(1, 1, 1));
-            Sphere fYellow = new Sphere(new Vector3(-0.6f, 0.7f, -0.6f), 0.3, new Vector3(0, 1, 1), 1f);
-            Sphere gCyan = new Sphere(new Vector3(0.3f, 0.4f, 0.3f), 0.6, new Vector3(1, 1, 0.88f), 1f);
+            Sphere fYellow = new Sphere(new Vector3(-0.6f, 0.7f, -0.6f), 0.3, new Vector3(0, 1, 1), 0.5f);
+            Sphere gCyan = new Sphere(new Vector3(0.3f, 0.4f, 0.3f), 0.6, new Vector3(1, 1, 0.88f), 0.5f);
 
             spheres[0] = aRed;
             spheres[1] = bBlue;
@@ -287,7 +287,7 @@ namespace CornellBox
 
             I += Ie + refl;
 
-            return Vector3.Multiply(I, hPoint.Sphere.Color);
+            return I;
         }
 
         private Vector3 Reflection(Hitpoint h, Ray ray, int recursionCount)
@@ -301,7 +301,7 @@ namespace CornellBox
 
                 Vector3 r = Vector3.Reflect(Vector3.Normalize(EH), Vector3.Normalize(n));
 
-                Ray reflectRay = new Ray(h.Position + n * 0.001f, Vector3.Normalize(r));
+                Ray reflectRay = new Ray(h.Position + r * 0.001f, Vector3.Normalize(r));
 
                 reflection = CalcColor(reflectRay, recursionCount - 1) * h.Sphere.Reflection;
             }
