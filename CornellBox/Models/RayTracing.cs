@@ -52,9 +52,8 @@ namespace CornellBox.Models
         {
             Vector3 diff = Vector3.Zero;
 
-            Vector3 n = Vector3.Normalize(Vector3.Subtract(h.Position, h.Sphere.Center));
             Vector3 l = Vector3.Normalize(Vector3.Subtract(light.Position, h.Position));
-            float nL = Vector3.Dot(n, l);
+            float nL = Vector3.Dot(h.Normal, l);
 
             if (nL >= 0)
             {
@@ -70,13 +69,12 @@ namespace CornellBox.Models
             Vector3 phong = Vector3.Zero;
 
             Vector3 l = Vector3.Subtract(light.Position, h.Position);
-            Vector3 n = Vector3.Normalize(Vector3.Subtract(h.Position, h.Sphere.Center));
 
-            float nL = Vector3.Dot(n, Vector3.Normalize(l));
+            float nL = Vector3.Dot(h.Normal, Vector3.Normalize(l));
             if (nL >= 0)
             {
-                float s1 = Vector3.Dot(l, n);
-                Vector3 s2 = Vector3.Multiply(s1, n);
+                float s1 = Vector3.Dot(l, h.Normal);
+                Vector3 s2 = Vector3.Multiply(s1, h.Normal);
                 Vector3 s = Vector3.Subtract(l, s2);
 
                 Vector3 r1 = Vector3.Multiply(2f, s);
@@ -95,9 +93,8 @@ namespace CornellBox.Models
             Vector3 shadow = Vector3.One;
 
             Vector3 hl = Vector3.Subtract(light.Position, h.Position);
-            Vector3 n = Vector3.Normalize(Vector3.Subtract(h.Position, h.Sphere.Center));
 
-            Ray lightRay = new Ray(h.Position + n * 0.001f, Vector3.Normalize(hl));
+            Ray lightRay = new Ray(h.Position + h.Normal * 0.001f, Vector3.Normalize(hl));
 
             foreach (Sphere s in spheres)
             {
@@ -122,10 +119,9 @@ namespace CornellBox.Models
             if (h.Sphere.Reflection > 0 && recursionCount > 0)
             {
                 Vector3 EH = Vector3.Subtract(h.Position, ray.Origin);
-                Vector3 n = Vector3.Subtract(h.Position, h.Sphere.Center);
-                Vector3 r = Vector3.Reflect(Vector3.Normalize(EH), Vector3.Normalize(n));
+                Vector3 r = Vector3.Reflect(Vector3.Normalize(EH), h.Normal);
 
-                Ray reflectRay = new Ray(h.Position + n * 0.001f, Vector3.Normalize(r));
+                Ray reflectRay = new Ray(h.Position + h.Normal * 0.001f, Vector3.Normalize(r));
 
                 reflection = CalcColor(reflectRay, recursionCount - 1) * h.Sphere.Reflection;
             }
