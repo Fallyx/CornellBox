@@ -11,6 +11,7 @@ namespace CornellBox
     {
         private Vector3 position;
         private Sphere sphere;
+        private Vector3 normal; // Add
 
         public Hitpoint(Vector3 position, Sphere sphere)
         {

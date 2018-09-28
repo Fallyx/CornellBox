@@ -27,13 +27,10 @@ namespace CornellBox
         Vector3 Eye = new Vector3(0, 0, -4);
         Vector3 LookAt = new Vector3(0, 0, 6);
         const double FOV = 36;
-
-        
+        int stride = 4 * imgWidth;
 
         Sphere[] spheres = new Sphere[7];
         List<LightSource> lights = new List<LightSource>();
-
-        int stride = 4 * imgWidth;
 
         WriteableBitmap wbmap;
 
@@ -46,8 +43,8 @@ namespace CornellBox
             Sphere cWhite = new Sphere(new Vector3(0, 0, 1001), 1000, new Vector3(1, 1, 1));
             Sphere dWhite = new Sphere(new Vector3(0, -1001, 0), 1000, new Vector3(1, 1, 1));
             Sphere eWhite = new Sphere(new Vector3(0, 1001, 0), 1000, new Vector3(1, 1, 1));
-            Sphere fYellow = new Sphere(new Vector3(-0.6f, 0.7f, -0.6f), 0.3, new Vector3(0, 1, 1), 0.5f);
-            Sphere gCyan = new Sphere(new Vector3(0.3f, 0.4f, 0.3f), 0.6, new Vector3(1, 1, 0.88f), 0.5f);
+            Sphere fYellow = new Sphere(new Vector3(-0.6f, 0.7f, -0.6f), 0.3, new Vector3(0, 1, 1), 1f);
+            Sphere gCyan = new Sphere(new Vector3(0.3f, 0.4f, 0.3f), 0.6, new Vector3(1, 1, 0.88f), 1f);
 
             spheres[0] = aRed;
             spheres[1] = bBlue;
@@ -57,7 +54,8 @@ namespace CornellBox
             spheres[5] = fYellow;
             spheres[6] = gCyan;
 
-            LightSource WhiteLight = new LightSource(new Vector3(0, -0.9f, 0), new Vector3(0.5f, 0.5f, 0.5f));
+            //LightSource WhiteLight = new LightSource(new Vector3(0, -0.9f, 0), new Vector3(0.5f, 0.5f, 0.5f));
+            LightSource WhiteLight = new LightSource(new Vector3(0, -0.9f, 0), new Vector3(1f, 1f, 1f));
             LightSource MagentaLight = new LightSource(new Vector3(-0.8f, -0.9f, 0), new Vector3(0.5f, 0f, 0.5f));
             LightSource YellowLight = new LightSource(new Vector3(0.8f, -0.9f, 0), new Vector3(0.5f, 0.5f, 0f));
 
@@ -85,7 +83,6 @@ namespace CornellBox
             byte[] pixels1d = new byte[imgHeight * imgWidth * 4];
             int index1d = 0;
             Ray eyeRay;
-            
 
             for (int col = 0; col < imgWidth; col++)
             {
@@ -97,14 +94,11 @@ namespace CornellBox
                     eyeRay = CreateEyeRay(Eye, LookAt, FOV, new Vector2((float)px, (float)py));
 
                     Vector3 color = CalcColor(eyeRay, 2);
+                    Color c = Color.FromScRgb(1, color.Z, color.Y, color.X);
 
-                    byte b = (byte)Math.Min(color.X * 255, 255);
-                    byte g = (byte)Math.Min(color.Y * 255, 255);
-                    byte r = (byte)Math.Min(color.Z * 255, 255);
-
-                    pixels1d[index1d++] = b;
-                    pixels1d[index1d++] = g;
-                    pixels1d[index1d++] = r;
+                    pixels1d[index1d++] = c.B;
+                    pixels1d[index1d++] = c.G;
+                    pixels1d[index1d++] = c.R;
                     
                     index1d++; // Skip Alpha
                 }
@@ -227,9 +221,10 @@ namespace CornellBox
         private Vector3 Shadow(LightSource light, Hitpoint h, Sphere[] spheres)
         {
             Vector3 shadow = Vector3.One;
-            
-            Vector3 hl = Vector3.Subtract(light.Position,  Vector3.Multiply(h.Position, 0.9f));
-            Ray lightRay = new Ray(h.Position, hl);
+
+            //Vector3 hl = Vector3.Subtract(light.Position, Vector3.Multiply(h.Position, 0.9f));
+            Vector3 hl = Vector3.Subtract(light.Position, h.Position);
+            Ray lightRay = new Ray(h.Position, Vector3.Normalize(hl) * 0.001f);
 
             foreach(Sphere s in spheres)
             {
@@ -261,7 +256,6 @@ namespace CornellBox
             double shorterLambda = (float)Math.Min(lambda1, lambda2);
 
             return shorterLambda > 0 ? shorterLambda : double.MaxValue;
-
         }
 
         private Vector3 CalcColor(Ray ray, int recursionCount)
@@ -270,7 +264,6 @@ namespace CornellBox
 
             Vector3 Ie = Vector3.Zero;
             Vector3 I = Vector3.Zero;
-
             Vector3 diff = Vector3.Zero;
             Vector3 phong = Vector3.Zero;
             Vector3 shadow = Vector3.Zero;
@@ -292,20 +285,20 @@ namespace CornellBox
             return Vector3.Multiply(I, hPoint.Sphere.Color);
         }
 
-        private Vector3 Reflection(Hitpoint h, Ray ray, int maxLevel)
+        private Vector3 Reflection(Hitpoint h, Ray ray, int recursionCount)
         {
             Vector3 reflection = Vector3.Zero;
 
-            if (h.Sphere.Reflection > 0 && maxLevel > 0)
+            if (h.Sphere.Reflection > 0 && recursionCount > 0)
             {
                 Vector3 EH = Vector3.Subtract(h.Position, ray.Origin);
                 Vector3 n = Vector3.Subtract(h.Position, h.Sphere.Center);
 
-                Vector3 r = Vector3.Reflect(EH, Vector3.Normalize(n));
+                Vector3 r = Vector3.Reflect(ray.Direction, n);
 
-                Ray reflectRay = new Ray(h.Position + r * 1.1f, Vector3.Normalize(r) * 1.1f);
+                Ray reflectRay = new Ray(h.Position + n * 0.1f, Vector3.Normalize(r) * 0.001f);
 
-                reflection = CalcColor(reflectRay, maxLevel - 1) * h.Sphere.Reflection;
+                reflection = CalcColor(reflectRay, recursionCount - 1) * h.Sphere.Reflection;
             }
 
             return reflection;
