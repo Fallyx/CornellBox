@@ -14,13 +14,16 @@ namespace CornellBox.Models
 
         public RayTracing(List<Sphere> spheres, List<LightSource> lights)
         {
-            this.spheres = spheres;
-            this.lights = lights;
+            Spheres = spheres;
+            Lights = lights;
         }
+
+        public List<Sphere> Spheres { get => spheres; private set => spheres = value; }
+        public List<LightSource> Lights { get => lights; private set => lights = value; }
 
         public Vector3 CalcColor(Ray ray, int recursionCount = 0)
         {
-            Hitpoint hPoint = Hitpoint.FindClosestHitPoint(spheres, ray);
+            Hitpoint hPoint = Hitpoint.FindClosestHitPoint(Spheres, ray);
 
             if (hPoint.Sphere == null)
             {
@@ -34,11 +37,11 @@ namespace CornellBox.Models
             Vector3 shadow = Vector3.Zero;
             Vector3 refl = Vector3.Zero;
 
-            foreach (LightSource light in lights)
+            foreach (LightSource light in Lights)
             {
                 diff = Diffuse(light, hPoint);
                 if (recursionCount == 0) phong = Phong(light, hPoint, 40, ray);
-                shadow = Shadow(light, hPoint, spheres);
+                shadow = Shadow(light, hPoint, Spheres);
 
                 I += (diff * shadow) + phong;
             }
