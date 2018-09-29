@@ -71,7 +71,7 @@ namespace CornellBox.Scenes
 
                     eyeRay = Ray.CreateEyeRay(Eye, LookAt, FOV, new Vector2((float)px, (float)py));
 
-                    Vector3 color = rayTracing.CalcColor(eyeRay, 1);
+                    Vector3 color = rayTracing.CalcColor(eyeRay);
 
                     Color c = Color.FromScRgb(1, color.Z, color.Y, color.X);
 

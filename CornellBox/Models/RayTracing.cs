@@ -7,6 +7,8 @@ namespace CornellBox.Models
 {
     public class RayTracing
     {
+        const int MAX_RECURSION = 1;
+
         private List<Sphere> spheres;
         private List<LightSource> lights;
 
@@ -16,7 +18,7 @@ namespace CornellBox.Models
             this.lights = lights;
         }
 
-        public Vector3 CalcColor(Ray ray, int recursionCount)
+        public Vector3 CalcColor(Ray ray, int recursionCount = 0)
         {
             Hitpoint hPoint = Hitpoint.FindClosestHitPoint(spheres, ray);
 
@@ -35,7 +37,7 @@ namespace CornellBox.Models
             foreach (LightSource light in lights)
             {
                 diff = Diffuse(light, hPoint);
-                phong = Phong(light, hPoint, 40, ray);
+                if (recursionCount == 0) phong = Phong(light, hPoint, 40, ray);
                 shadow = Shadow(light, hPoint, spheres);
 
                 I += (diff * shadow) + phong;
@@ -116,14 +118,14 @@ namespace CornellBox.Models
         {
             Vector3 reflection = Vector3.Zero;
 
-            if (h.Sphere.Reflection > 0 && recursionCount > 0)
+            if (h.Sphere.Reflection > 0 && recursionCount < MAX_RECURSION)
             {
                 Vector3 EH = Vector3.Subtract(h.Position, ray.Origin);
                 Vector3 r = Vector3.Reflect(Vector3.Normalize(EH), h.Normal);
 
                 Ray reflectRay = new Ray(h.Position + h.Normal * 0.001f, Vector3.Normalize(r));
 
-                reflection = CalcColor(reflectRay, recursionCount - 1) * h.Sphere.Reflection;
+                reflection = CalcColor(reflectRay, recursionCount + 1) * h.Sphere.Reflection;
             }
 
             return reflection;
