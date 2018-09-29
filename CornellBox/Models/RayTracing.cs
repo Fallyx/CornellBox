@@ -124,11 +124,16 @@ namespace CornellBox.Models
             if (h.Sphere.Material.Reflection > 0 && recursionCount < MAX_RECURSION)
             {
                 Vector3 EH = Vector3.Subtract(h.Position, ray.Origin);
-                Vector3 r = Vector3.Reflect(Vector3.Normalize(EH), h.Normal);
+                Vector3 r = Vector3.Normalize(Vector3.Reflect(Vector3.Normalize(EH), h.Normal));
 
-                Ray reflectRay = new Ray(h.Position + h.Normal * 0.001f, Vector3.Normalize(r));
+                Ray reflectRay = new Ray(h.Position + h.Normal * 0.001f, r);
 
-                reflection = CalcColor(reflectRay, recursionCount + 1) * h.Sphere.Material.Reflection;
+                float Krf1 = 1 - h.Sphere.Material.Reflection;
+                float Krf2 = (float)Math.Pow(1 - Vector3.Dot(h.Normal, r), 5);
+                float Krf = h.Sphere.Material.Reflection + Krf1 * Krf2;
+
+
+                reflection = CalcColor(reflectRay, recursionCount + 1) * Krf;
             }
 
             return reflection;
