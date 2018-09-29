@@ -60,6 +60,7 @@
     <Compile Include="Models\Hitpoint.cs" />
     <Compile Include="Models\LightSource.cs" />
     <Compile Include="Helpers\Midnight.cs" />
+    <Compile Include="Models\Material.cs" />
     <Compile Include="Models\Ray.cs" />
     <Compile Include="Models\RayTracing.cs" />
     <Compile Include="Scenes\CornellBoxScene.cs" />

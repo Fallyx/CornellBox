@@ -62,7 +62,7 @@ namespace CornellBox.Models
 
             if (nL >= 0)
             {
-                Vector3 ilm = Vector3.Multiply(light.Color, h.Sphere.Color);
+                Vector3 ilm = Vector3.Multiply(light.Color, h.Sphere.Material.Color);
                 diff = Vector3.Multiply(ilm, nL);
             }
 
@@ -121,14 +121,14 @@ namespace CornellBox.Models
         {
             Vector3 reflection = Vector3.Zero;
 
-            if (h.Sphere.Reflection > 0 && recursionCount < MAX_RECURSION)
+            if (h.Sphere.Material.Reflection > 0 && recursionCount < MAX_RECURSION)
             {
                 Vector3 EH = Vector3.Subtract(h.Position, ray.Origin);
                 Vector3 r = Vector3.Reflect(Vector3.Normalize(EH), h.Normal);
 
                 Ray reflectRay = new Ray(h.Position + h.Normal * 0.001f, Vector3.Normalize(r));
 
-                reflection = CalcColor(reflectRay, recursionCount + 1) * h.Sphere.Reflection;
+                reflection = CalcColor(reflectRay, recursionCount + 1) * h.Sphere.Material.Reflection;
             }
 
             return reflection;

@@ -6,20 +6,17 @@ namespace CornellBox.Models
     {
         private Vector3 center;
         private double radius;
-        private Vector3 color;
-        private float reflection;
+        private Material material;
 
-        public Sphere(Vector3 center, double radius, Vector3 color, float reflection = 0)
+        public Sphere(Vector3 center, double radius, Material material)
         {
             Center = center;
             Radius = radius;
-            Color = color;
-            Reflection = reflection;
+            Material = material;
         }
 
         public Vector3 Center { get => center; private set => center = value; }
         public double Radius { get => radius; private set => radius = value; }
-        public Vector3 Color { get => color; private set => color = value; }
-        public float Reflection { get => reflection; private set => reflection = value; }
+        internal Material Material { get => material; private set => material = value; }
     }
 }
