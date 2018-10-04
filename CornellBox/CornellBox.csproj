@@ -57,6 +57,7 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
+    <Compile Include="Models\BoundingSphere.cs" />
     <Compile Include="Models\Hitpoint.cs" />
     <Compile Include="Models\LightSource.cs" />
     <Compile Include="Helpers\Midnight.cs" />

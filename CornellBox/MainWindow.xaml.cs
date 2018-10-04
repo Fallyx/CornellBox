@@ -32,9 +32,12 @@ namespace CornellBox
             InitializeComponent();
 
             spheres = CornellBoxScene.InitSphere();
-            lights = CornellBoxScene.InitLight(true);
+            lights = CornellBoxScene.InitLight(false);
 
             // CompositionTarget.Rendering += Render;
+
+            BoundingSphere bsh = new BoundingSphere(Vector3.Zero, 10.0, null, true, (BoundingSphere) spheres[0], (BoundingSphere)spheres[1]);
+            BoundingSphere bsh1 = new BoundingSphere(Vector3.One, 5.0, null, true, (BoundingSphere)spheres[2], bsh);
 
             wbmap = new WriteableBitmap(
                 imgWidth,

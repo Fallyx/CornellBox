@@ -25,11 +25,8 @@ namespace CornellBox.Models
         {
             Hitpoint hPoint = Hitpoint.FindClosestHitPoint(Spheres, ray);
 
-            if (hPoint.Sphere == null)
-            {
-                return Vector3.Zero;
-            }
-
+            if (hPoint.Sphere == null) return Vector3.Zero;
+            
             Vector3 Ie = Vector3.Zero;
             Vector3 I = Vector3.Zero;
             Vector3 diff = Vector3.Zero;
@@ -47,7 +44,6 @@ namespace CornellBox.Models
             }
 
             refl = Reflection(hPoint, ray, recursionCount);
-
             I += Ie + refl;
 
             return I;
@@ -56,7 +52,6 @@ namespace CornellBox.Models
         private Vector3 Diffuse(LightSource light, Hitpoint h)
         {
             Vector3 diff = Vector3.Zero;
-
             Vector3 l = Vector3.Normalize(Vector3.Subtract(light.Position, h.Position));
             float nL = Vector3.Dot(h.Normal, l);
 
@@ -72,7 +67,6 @@ namespace CornellBox.Models
         private Vector3 Phong(LightSource light, Hitpoint h, int phongExp, Ray ray)
         {
             Vector3 phong = Vector3.Zero;
-
             Vector3 l = Vector3.Subtract(light.Position, h.Position);
 
             float nL = Vector3.Dot(h.Normal, Vector3.Normalize(l));
@@ -96,7 +90,6 @@ namespace CornellBox.Models
         private Vector3 Shadow(LightSource light, Hitpoint h, List<Sphere> spheres)
         {
             Vector3 shadow = Vector3.One;
-
             Vector3 hl = Vector3.Subtract(light.Position, h.Position);
 
             Ray lightRay = new Ray(h.Position + h.Normal * 0.001f, Vector3.Normalize(hl));
@@ -104,7 +97,6 @@ namespace CornellBox.Models
             foreach (Sphere s in spheres)
             {
                 float[] mVars = Midnight.MidnightVars(s, lightRay);
-
 
                 double lambda = Midnight.CalcLambda(mVars[0], mVars[1], mVars[2]);
                 if (lambda < hl.Length())
@@ -131,7 +123,6 @@ namespace CornellBox.Models
                 float Krf1 = 1 - h.Sphere.Material.Reflection;
                 float Krf2 = (float)Math.Pow(1 - Vector3.Dot(h.Normal, r), 5);
                 float Krf = h.Sphere.Material.Reflection + Krf1 * Krf2;
-
 
                 reflection = CalcColor(reflectRay, recursionCount + 1) * Krf;
             }
