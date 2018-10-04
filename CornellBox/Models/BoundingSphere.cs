@@ -27,6 +27,8 @@ namespace CornellBox.Models
 
         public static BoundingSphere BVH(List<Sphere> spheres)
         {
+            BoundingSphere rootBVH = null;
+
             List<BoundingSphere> bSpheres = new List<BoundingSphere>();
             foreach(Sphere s in spheres)
             {
@@ -35,10 +37,10 @@ namespace CornellBox.Models
 
             for(int i = 0; i < spheres.Count - 1; i++)
             {
-                BoundingSphere bsLeft;
-                BoundingSphere bsRight;
+                BoundingSphere bsLeft = null;
+                BoundingSphere bsRight = null;
+                BoundingSphere node = null;
                 Vector3 distance = new Vector3(float.PositiveInfinity, float.PositiveInfinity, float.PositiveInfinity);
-
 
                 for(int x = 0; x < bSpheres.Count - 1; x++)
                 {
@@ -46,14 +48,23 @@ namespace CornellBox.Models
                     {
                         if (Vector3.Subtract(bSpheres[x].Center, bSpheres[y].Center).Length() > distance.Length()) continue;
 
-                        //Vector3 
+                        distance = bSpheres[y].Center - bSpheres[x].Center;
+
+                        double radius = (distance.Length() + bSpheres[x].Radius + bSpheres[y].Radius) / 2.0;
+                        Vector3 center = bSpheres[x].Center + Vector3.Normalize(bSpheres[y].Center - bSpheres[x].Center) * (float)(radius - bSpheres[x].Radius);
+
+                        bsLeft = bSpheres[x];
+                        bsRight = bSpheres[y];
+                        node = new BoundingSphere(center, radius, null, true, bSpheres[x], bSpheres[y]);
                     }
                 }
+
+                bSpheres.Remove(bsLeft);
+                bSpheres.Remove(bsRight);
+                bSpheres.Add(node);
+
+                rootBVH = bSpheres[0];
             }
-
-            BoundingSphere rootBVH = null;
-
-
 
             return rootBVH;
         }
