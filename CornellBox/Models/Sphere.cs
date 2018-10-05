@@ -2,21 +2,18 @@
 
 namespace CornellBox.Models
 {
-    public class Sphere
+    public abstract class Sphere
     {
         private Vector3 center;
         private double radius;
-        private Material material;
 
-        public Sphere(Vector3 center, double radius, Material material)
+        public Sphere(Vector3 center, double radius)
         {
             Center = center;
             Radius = radius;
-            Material = material;
         }
 
         public Vector3 Center { get => center; private set => center = value; }
         public double Radius { get => radius; private set => radius = value; }
-        internal Material Material { get => material; private set => material = value; }
     }
 }

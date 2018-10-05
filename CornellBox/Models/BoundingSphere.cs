@@ -14,7 +14,7 @@ namespace CornellBox.Models
         private BoundingSphere rightChild;
 
 
-        public BoundingSphere(Vector3 center, double radius, Material material, bool hasChildren, BoundingSphere leftChild, BoundingSphere rightChild) : base (center, radius, material)
+        public BoundingSphere(Vector3 center, double radius, bool hasChildren, BoundingSphere leftChild, BoundingSphere rightChild) : base (center, radius)
         {
             HasChildren = hasChildren;
             LeftChild = leftChild;
@@ -32,7 +32,7 @@ namespace CornellBox.Models
             List<BoundingSphere> bSpheres = new List<BoundingSphere>();
             foreach(Sphere s in spheres)
             {
-                bSpheres.Add(new BoundingSphere(s.Center, s.Radius, s.Material, false, null, null));
+                bSpheres.Add(new BoundingSphere(s.Center, s.Radius, false, null, null));
             }
 
             for(int i = 0; i < spheres.Count - 1; i++)
@@ -55,7 +55,7 @@ namespace CornellBox.Models
 
                         bsLeft = bSpheres[x];
                         bsRight = bSpheres[y];
-                        node = new BoundingSphere(center, radius, null, true, bSpheres[x], bSpheres[y]);
+                        node = new BoundingSphere(center, radius, true, bSpheres[x], bSpheres[y]);
                     }
                 }
 

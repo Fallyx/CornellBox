@@ -26,6 +26,8 @@ namespace CornellBox.Models
             Hitpoint hPoint = Hitpoint.FindClosestHitPoint(Spheres, ray);
 
             if (hPoint.Sphere == null) return Vector3.Zero;
+
+            MaterialSphere mSphere = hPoint.Sphere as MaterialSphere;
             
             Vector3 Ie = Vector3.Zero;
             Vector3 I = Vector3.Zero;
@@ -36,14 +38,16 @@ namespace CornellBox.Models
 
             foreach (LightSource light in Lights)
             {
-                diff = Diffuse(light, hPoint);
-                if (recursionCount == 0) phong = Phong(light, hPoint, 40, ray);
-                shadow = Shadow(light, hPoint, Spheres);
+                if (mSphere.HasDiffuse) diff = Diffuse(light, hPoint);
+                else if (mSphere.Material.HasImg) diff = mSphere.Material.GetColorFromImage(hPoint.Position);
+                else diff = mSphere.Material.Color;
+                if (recursionCount == 0 && mSphere.HasPhong) phong = Phong(light, hPoint, 40, ray);
+                if(mSphere.HasShadow) shadow = Shadow(light, hPoint, Spheres);
 
                 I += (diff * shadow) + phong;
             }
 
-            refl = Reflection(hPoint, ray, recursionCount);
+            if(mSphere.HasReflection) refl = Reflection(hPoint, ray, recursionCount);
             I += Ie + refl;
 
             return I;
@@ -57,7 +61,15 @@ namespace CornellBox.Models
 
             if (nL >= 0)
             {
-                Vector3 ilm = Vector3.Multiply(light.Color, h.Sphere.Material.Color);
+                MaterialSphere mSphere = h.Sphere as MaterialSphere;
+
+                Vector3 color;
+                if (mSphere.Material.HasImg)
+                    color = mSphere.Material.GetColorFromImage(h.Position);
+                else
+                    color = mSphere.Material.Color;
+
+                Vector3 ilm = Vector3.Multiply(light.Color, color);
                 diff = Vector3.Multiply(ilm, nL);
             }
 
@@ -112,17 +124,18 @@ namespace CornellBox.Models
         private Vector3 Reflection(Hitpoint h, Ray ray, int recursionCount)
         {
             Vector3 reflection = Vector3.Zero;
+            MaterialSphere mSphere = h.Sphere as MaterialSphere;
 
-            if (h.Sphere.Material.Reflection > 0 && recursionCount < MAX_RECURSION)
+            if (mSphere.Material.Reflection > 0 && recursionCount < MAX_RECURSION)
             {
                 Vector3 EH = Vector3.Subtract(h.Position, ray.Origin);
                 Vector3 r = Vector3.Normalize(Vector3.Reflect(Vector3.Normalize(EH), h.Normal));
 
                 Ray reflectRay = new Ray(h.Position + h.Normal * 0.001f, r);
 
-                float Krf1 = 1 - h.Sphere.Material.Reflection;
+                float Krf1 = 1 - mSphere.Material.Reflection;
                 float Krf2 = (float)Math.Pow(1 - Vector3.Dot(h.Normal, r), 5);
-                float Krf = h.Sphere.Material.Reflection + Krf1 * Krf2;
+                float Krf = mSphere.Material.Reflection + Krf1 * Krf2;
 
                 reflection = CalcColor(reflectRay, recursionCount + 1) * Krf;
             }
