@@ -35,7 +35,11 @@ namespace CornellBox.Models
             {
                 double s = Math.Atan2(position.X, position.Z) / (2 * Math.PI);
                 double t = Math.Acos(position.Y) / Math.PI;
-                imgColor = GetColorFromImage(s, t);
+
+                double _s = (s - -Math.PI) * (1 - -1) / (Math.PI - -Math.PI) + -1;
+                double _t = (t - 0) * (1 - -1) / (Math.PI - 0) + -1;
+
+                imgColor = GetColorFromImage(_s, _t);
             }
             return imgColor;
         }
