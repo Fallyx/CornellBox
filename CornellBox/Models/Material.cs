@@ -27,20 +27,36 @@ namespace CornellBox.Models
         public string ImgPath { get => imgPath; set => imgPath = value; }
         public bool HasImg { get => hasImg; private set => hasImg = value; }
 
-        public Vector3 GetColorFromImage(Vector3 position)
+        public Vector3 SphericalProjection(Vector3 position)
         {
-            double s = Math.Atan2(Math.Min(1, Math.Max(-1, position.X)), Math.Min(1, Math.Max(-1, position.Z)));
-            double t = Math.Acos(Math.Min(1, Math.Max(-1, position.Z))); 
-
             Vector3 imgColor = Vector3.Zero;
+
+            if (position.X >= -1f && position.X <= 1 && position.Y >= -1f && position.Y <= 1 && position.Z >= -1f && position.Z <= 1)
+            {
+                double s = Math.Atan2(position.X, position.Z) / (2 * Math.PI);
+                double t = Math.Acos(position.Y) / Math.PI;
+                imgColor = GetColorFromImage(s, t);
+            }
+            return imgColor;
+        }
+
+        public Vector3 PlanarProjection(Vector3 position)
+        {
+            double s = position.X;
+            double t = position.Y;
+            Vector3 imgColor = GetColorFromImage(s, t);
+
+            return imgColor;
+        }
+
+        private Vector3 GetColorFromImage(double s, double t)
+        {
+            Vector3 imgColor = Vector3.One;
 
             using (Bitmap bmp = new Bitmap(ImgPath))
             {
-                //int x = (int)(Math.Min(Math.Round((s+1) * bmp.Width / 2f), bmp.Width - 1));
-                //int y = (int)(Math.Min(Math.Round((t+1) * bmp.Height / 2f), bmp.Height - 1));
-
-                int x = (int)((Math.Min(1, Math.Max(-1, s)) + 1) / 2f * (bmp.Width - 1));
-                int y = (int)((Math.Min(1, Math.Max(-1, t)) + 1) / 2f * (bmp.Height - 1));
+                int x = (int)((s + 1) / 2f * (bmp.Width - 1)) % bmp.Width;
+                int y = (int)((t + 1) / 2f * (bmp.Height - 1)) % bmp.Height;
 
                 var clr = bmp.GetPixel(x, y);
                 System.Windows.Media.Color c = System.Windows.Media.Color.FromRgb(clr.R, clr.G, clr.B);
@@ -50,6 +66,8 @@ namespace CornellBox.Models
 
             return imgColor;
         }
+
+
 
         public static string BrickImage()
         {

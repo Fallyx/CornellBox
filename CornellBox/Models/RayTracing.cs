@@ -33,13 +33,13 @@ namespace CornellBox.Models
             Vector3 I = Vector3.Zero;
             Vector3 diff = Vector3.Zero;
             Vector3 phong = Vector3.Zero;
-            Vector3 shadow = Vector3.Zero;
+            Vector3 shadow = Vector3.One;
             Vector3 refl = Vector3.Zero;
 
             foreach (LightSource light in Lights)
             {
                 if (mSphere.HasDiffuse) diff = Diffuse(light, hPoint);
-                else if (mSphere.Material.HasImg) diff = mSphere.Material.GetColorFromImage(hPoint.Position);
+                else if (mSphere.Material.HasImg) diff = mSphere.Material.PlanarProjection(hPoint.Position);
                 else diff = mSphere.Material.Color;
                 if (recursionCount == 0 && mSphere.HasPhong) phong = Phong(light, hPoint, 40, ray);
                 if(mSphere.HasShadow) shadow = Shadow(light, hPoint, Spheres);
@@ -65,7 +65,7 @@ namespace CornellBox.Models
 
                 Vector3 color;
                 if (mSphere.Material.HasImg)
-                    color = mSphere.Material.GetColorFromImage(h.Position);
+                    color = mSphere.Material.PlanarProjection(h.Position);
                 else
                     color = mSphere.Material.Color;
 
