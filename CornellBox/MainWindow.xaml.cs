@@ -24,6 +24,7 @@ namespace CornellBox
 
         List<Sphere> spheres = new List<Sphere>();
         List<LightSource> lights = new List<LightSource>();
+        BoundingSphere bvh;
 
         WriteableBitmap wbmap;
 
@@ -36,7 +37,7 @@ namespace CornellBox
 
             // CompositionTarget.Rendering += Render;
 
-            BoundingSphere bvh = BoundingSphere.BVH(spheres);
+            bvh = BoundingSphere.BVH(spheres);
 
             wbmap = new WriteableBitmap(
                 imgWidth,
@@ -53,7 +54,8 @@ namespace CornellBox
 
         private void Render()
         {
-            byte[] pixels1d = CornellBoxScene.PixelArray(imgHeight, imgWidth, 4, spheres, lights, Eye, LookAt, FOV);
+            //byte[] pixels1d = CornellBoxScene.PixelArray(imgHeight, imgWidth, 4, spheres, lights, Eye, LookAt, FOV);
+            byte[] pixels1d = CornellBoxScene.PixelArray(imgHeight, imgWidth, 4, bvh, lights, Eye, LookAt, FOV);
 
             Int32Rect rect = new Int32Rect(0, 0, imgWidth, imgHeight);            
             wbmap.WritePixels(rect, pixels1d, stride, 0);

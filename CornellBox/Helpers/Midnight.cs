@@ -39,6 +39,15 @@ namespace CornellBox.Helpers
             double lambda1 = (-b + Math.Sqrt(b * b - 4 * a * c)) / (2 * a);
             double lambda2 = (-b - Math.Sqrt(b * b - 4 * a * c)) / (2 * a);
 
+            if(lambda1 > 0 && lambda2 < 0)
+            {
+                return lambda1;
+            }
+            else if(lambda2 > 0 && lambda1 < 0)
+            {
+                return lambda2;
+            }
+
             double shorterLambda = (float)Math.Min(lambda1, lambda2);
 
             return shorterLambda > 0 ? shorterLambda : double.MaxValue;

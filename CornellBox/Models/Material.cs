@@ -2,7 +2,6 @@
 using System.Drawing;
 using System.Numerics;
 
-
 namespace CornellBox.Models
 {
     public class Material
@@ -70,8 +69,6 @@ namespace CornellBox.Models
 
             return imgColor;
         }
-
-
 
         public static string BrickImage()
         {

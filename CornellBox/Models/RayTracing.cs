@@ -12,6 +12,11 @@ namespace CornellBox.Models
         private List<Sphere> spheres;
         private List<LightSource> lights;
 
+        public RayTracing(List<LightSource> lights)
+        {
+            Lights = lights;
+        }
+
         public RayTracing(List<Sphere> spheres, List<LightSource> lights)
         {
             Spheres = spheres;
@@ -28,7 +33,7 @@ namespace CornellBox.Models
             if (hPoint.Sphere == null) return Vector3.Zero;
 
             MaterialSphere mSphere = hPoint.Sphere as MaterialSphere;
-            
+
             Vector3 Ie = Vector3.Zero;
             Vector3 I = Vector3.Zero;
             Vector3 diff = Vector3.Zero;
@@ -42,12 +47,44 @@ namespace CornellBox.Models
                 else if (mSphere.Material.HasImg) diff = mSphere.Material.SphericalProjection(hPoint.Position);
                 else diff = mSphere.Material.Color;
                 if (recursionCount == 0 && mSphere.HasPhong) phong = Phong(light, hPoint, 40, ray);
-                if(mSphere.HasShadow) shadow = Shadow(light, hPoint, Spheres);
+                if (mSphere.HasShadow) shadow = Shadow(light, hPoint, Spheres);
 
                 I += (diff * shadow) + phong;
             }
 
-            if(mSphere.HasReflection) refl = Reflection(hPoint, ray, recursionCount);
+            if (mSphere.HasReflection) refl = Reflection(hPoint, ray, recursionCount);
+            I += Ie + refl;
+
+            return I;
+        }
+
+        public Vector3 CalcColor(Ray ray, BoundingSphere bSphere, int recursionCount = 0)
+        {
+            Hitpoint hPoint = Hitpoint.FindClosestHitPoint(bSphere, ray);
+
+            if (hPoint.Sphere == null) return Vector3.Zero;
+
+            MaterialSphere mSphere = hPoint.Sphere as MaterialSphere;
+
+            Vector3 Ie = Vector3.Zero;
+            Vector3 I = Vector3.Zero;
+            Vector3 diff = Vector3.Zero;
+            Vector3 phong = Vector3.Zero;
+            Vector3 shadow = Vector3.One;
+            Vector3 refl = Vector3.Zero;
+
+            foreach (LightSource light in Lights)
+            {
+                if (mSphere.HasDiffuse) diff = Diffuse(light, hPoint);
+                else if (mSphere.Material.HasImg) diff = mSphere.Material.SphericalProjection(hPoint.Position);
+                else diff = mSphere.Material.Color;
+                if (recursionCount == 0 && mSphere.HasPhong) phong = Phong(light, hPoint, 40, ray);
+                if (mSphere.HasShadow) shadow = Shadow(light, hPoint, bSphere);
+
+                I += (diff * shadow) + phong;
+            }
+
+            if (mSphere.HasReflection) refl = Reflection(hPoint, ray, bSphere, recursionCount);
             I += Ie + refl;
 
             return I;
@@ -106,16 +143,32 @@ namespace CornellBox.Models
 
             Ray lightRay = new Ray(h.Position + h.Normal * 0.001f, Vector3.Normalize(hl));
 
-            foreach (Sphere s in spheres)
-            {
-                float[] mVars = Midnight.MidnightVars(s, lightRay);
+            Hitpoint shadowHitpoint = Hitpoint.FindClosestHitPoint(spheres, lightRay);
 
-                double lambda = Midnight.CalcLambda(mVars[0], mVars[1], mVars[2]);
-                if (lambda < hl.Length())
-                {
-                    shadow = new Vector3(light.Color.X * 0.2f, light.Color.Y * 0.2f, light.Color.Z * 0.2f);
-                    break;
-                }
+            if (shadowHitpoint.Sphere == null) return shadow;
+
+            if (shadowHitpoint.Lambda < hl.Length())
+            {
+                shadow = new Vector3(light.Color.X * 0.2f, light.Color.Y * 0.2f, light.Color.Z * 0.2f);
+            }
+
+            return shadow;
+        }
+
+        private Vector3 Shadow(LightSource light, Hitpoint h, BoundingSphere bSphere)
+        {
+            Vector3 shadow = Vector3.One;
+            Vector3 hl = Vector3.Subtract(light.Position, h.Position);
+
+            Ray lightRay = new Ray(h.Position + h.Normal * 0.001f, Vector3.Normalize(hl));
+
+            Hitpoint shadowHitpoint = Hitpoint.FindClosestHitPoint(bSphere, lightRay);
+
+            if (shadowHitpoint.Sphere == null) return shadow;
+
+            if (shadowHitpoint.Lambda < hl.Length())
+            {
+                shadow = new Vector3(light.Color.X * 0.2f, light.Color.Y * 0.2f, light.Color.Z * 0.2f);
             }
 
             return shadow;
@@ -138,6 +191,28 @@ namespace CornellBox.Models
                 float Krf = mSphere.Material.Reflection + Krf1 * Krf2;
 
                 reflection = CalcColor(reflectRay, recursionCount + 1) * Krf;
+            }
+
+            return reflection;
+        }
+
+        private Vector3 Reflection(Hitpoint h, Ray ray, BoundingSphere bSphere, int recursionCount)
+        {
+            Vector3 reflection = Vector3.Zero;
+            MaterialSphere mSphere = h.Sphere as MaterialSphere;
+
+            if (mSphere.Material.Reflection > 0 && recursionCount < MAX_RECURSION)
+            {
+                Vector3 EH = Vector3.Subtract(h.Position, ray.Origin);
+                Vector3 r = Vector3.Normalize(Vector3.Reflect(Vector3.Normalize(EH), h.Normal));
+
+                Ray reflectRay = new Ray(h.Position + h.Normal * 0.001f, r);
+
+                float Krf1 = 1 - mSphere.Material.Reflection;
+                float Krf2 = (float)Math.Pow(1 - Vector3.Dot(h.Normal, r), 5);
+                float Krf = mSphere.Material.Reflection + Krf1 * Krf2;
+
+                reflection = CalcColor(reflectRay, bSphere, recursionCount + 1) * Krf;
             }
 
             return reflection;

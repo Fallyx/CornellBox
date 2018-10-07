@@ -12,18 +12,20 @@ namespace CornellBox.Models
         private bool hasChildren;
         private BoundingSphere leftChild;
         private BoundingSphere rightChild;
+        private MaterialSphere mSphere;
 
-
-        public BoundingSphere(Vector3 center, double radius, bool hasChildren, BoundingSphere leftChild, BoundingSphere rightChild) : base (center, radius)
+        public BoundingSphere(Vector3 center, double radius, bool hasChildren, BoundingSphere leftChild, BoundingSphere rightChild, MaterialSphere mSphere = null) : base (center, radius)
         {
             HasChildren = hasChildren;
             LeftChild = leftChild;
             RightChild = rightChild;
+            MSphere = mSphere;
         }
 
         public bool HasChildren { get => hasChildren; private set => hasChildren = value; }
         public BoundingSphere LeftChild { get => leftChild; private set => leftChild = value; }
         public BoundingSphere RightChild { get => rightChild; private set => rightChild = value; }
+        public MaterialSphere MSphere { get => mSphere; private set => mSphere = value; }
 
         public static BoundingSphere BVH(List<Sphere> spheres)
         {
@@ -32,7 +34,8 @@ namespace CornellBox.Models
             List<BoundingSphere> bSpheres = new List<BoundingSphere>();
             foreach(Sphere s in spheres)
             {
-                bSpheres.Add(new BoundingSphere(s.Center, s.Radius, false, null, null));
+                MaterialSphere mS = s as MaterialSphere;
+                bSpheres.Add(new BoundingSphere(s.Center, s.Radius, false, null, null, mS));
             }
 
             for(int i = 0; i < spheres.Count - 1; i++)

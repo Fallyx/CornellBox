@@ -55,7 +55,7 @@ namespace CornellBox.Scenes
             return lights;
         }
         
-        public static byte[] PixelArray (int imgHeight, int imgWidth, int stride, List<Sphere> spheres, List<LightSource> lights, Vector3 Eye, Vector3 LookAt, double FOV)
+        public static byte[] PixelArray(int imgHeight, int imgWidth, int stride, List<Sphere> spheres, List<LightSource> lights, Vector3 Eye, Vector3 LookAt, double FOV)
         {
             byte[] pixels = new byte[imgHeight * imgWidth * stride];
             int index = 0;
@@ -73,6 +73,38 @@ namespace CornellBox.Scenes
                     eyeRay = Ray.CreateEyeRay(Eye, LookAt, FOV, new Vector2((float)px, (float)py));
 
                     Vector3 color = rayTracing.CalcColor(eyeRay);
+
+                    Color c = Color.FromScRgb(1, color.Z, color.Y, color.X);
+
+                    pixels[index++] = c.B;
+                    pixels[index++] = c.G;
+                    pixels[index++] = c.R;
+
+                    index++; // Skip Alpha
+                }
+            }
+
+            return pixels;
+        }
+
+        public static byte[] PixelArray(int imgHeight, int imgWidth, int stride, BoundingSphere bSphere, List<LightSource> lights, Vector3 Eye, Vector3 LookAt, double FOV)
+        {
+            byte[] pixels = new byte[imgHeight * imgWidth * stride];
+            int index = 0;
+            Ray eyeRay;
+
+            RayTracing rayTracing = new RayTracing(lights);
+
+            for (int col = 0; col < imgWidth; col++)
+            {
+                for (int row = 0; row < imgHeight; row++)
+                {
+                    double px = (col / (imgWidth - 1d)) * 2 - 1;
+                    double py = (row / (imgHeight - 1d)) * 2 - 1;
+
+                    eyeRay = Ray.CreateEyeRay(Eye, LookAt, FOV, new Vector2((float)px, (float)py));
+
+                    Vector3 color = rayTracing.CalcColor(eyeRay, bSphere);
 
                     Color c = Color.FromScRgb(1, color.Z, color.Y, color.X);
 
