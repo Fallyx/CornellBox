@@ -59,6 +59,7 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
+    <Compile Include="Helpers\MathHelper.cs" />
     <Compile Include="Models\BoundingSphere.cs" />
     <Compile Include="Models\Hitpoint.cs" />
     <Compile Include="Models\LightSource.cs" />

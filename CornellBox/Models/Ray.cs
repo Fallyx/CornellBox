@@ -17,6 +17,13 @@ namespace CornellBox.Models
         public Vector3 Origin { get => origin; private set => origin = value; }
         public Vector3 Direction { get => direction; private set => direction = value; }
         
+        public static Ray Randomize(Ray ray)
+        {
+            Random rnd = new Random();
+
+            return new Ray(ray.Origin + ray.Origin * (float)rnd.NextDouble(), ray.Direction + ray.Direction * (float)rnd.NextDouble());
+        }
+
         /// <summary>
         /// Creates a ray from the eye
         /// </summary>
