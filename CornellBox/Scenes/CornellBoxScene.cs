@@ -16,9 +16,10 @@ namespace CornellBox.Scenes
             Sphere cWhite = new MaterialSphere(new Vector3(0, 0, 1001), 1000, new Material(new Vector3(1, 1, 1)));
             Sphere dWhite = new MaterialSphere(new Vector3(0, -1001, 0), 1000, new Material(new Vector3(1, 1, 1)));
             Sphere eWhite = new MaterialSphere(new Vector3(0, 1001, 0), 1000, new Material(new Vector3(1, 1, 1)));
-            Sphere fYellow = new MaterialSphere(new Vector3(-0.6f, 0.7f, -0.6f), 0.3, new Material(new Vector3(0, 1, 1), 0.5f));
+            //Sphere fYellow = new MaterialSphere(new Vector3(-0.6f, 0.7f, -0.6f), 0.3, new Material(new Vector3(0, 1, 1), 0.5f));
             //Sphere gCyan = new MaterialSphere(new Vector3(0.3f, 0.4f, 0.3f), 0.6, new Material(new Vector3(1, 1, 0.88f), 0.5f));
-            Sphere gCyan = new MaterialSphere(new Vector3(0.3f, 0.4f, 0.3f), 0.6, new Material(new Vector3(1, 1, 0.88f), imgPath: Material.BrickImage()),false, false,false, false);
+            Sphere fYellow = new MaterialSphere(new Vector3(-0.6f, 0.7f, -0.6f), 0.3, new Material(new Vector3(0, 1, 1), 0.5f, Material.BrickImage()));
+            Sphere gCyan = new MaterialSphere(new Vector3(0.3f, 0.4f, 0.3f), 0.6, new Material(new Vector3(1, 1, 0.88f), imgPath: Material.EarthImage(), offset: new Vector2(0.5f, 0)),false, false,false, false);
 
             spheres.Add(aRed);
             spheres.Add(bBlue);
