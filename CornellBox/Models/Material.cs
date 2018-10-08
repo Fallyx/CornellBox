@@ -32,14 +32,19 @@ namespace CornellBox.Models
         public Bitmap Img { get => img; set => img = value; }
         public Vector2 Offset { get => offset; set => offset = value; }
 
-        public Vector3 SphericalProjection(Vector3 position)
+        /// <summary>
+        /// Get the color from an image
+        /// </summary>
+        /// <param name="direction">Hitpoint direction</param>
+        /// <returns>Color vector</returns>
+        public Vector3 SphericalProjection(Vector3 direction)
         {
             Vector3 imgColor = Vector3.Zero;
 
-            if (position.X >= -1f && position.X <= 1 && position.Y >= -1f && position.Y <= 1 && position.Z >= -1f && position.Z <= 1)
+            if (direction.X >= -1f && direction.X <= 1 && direction.Y >= -1f && direction.Y <= 1 && direction.Z >= -1f && direction.Z <= 1)
             {
-                double s = Math.Atan2(position.X, position.Z);
-                double t = Math.Acos(position.Y);
+                double s = Math.Atan2(direction.X, direction.Z);
+                double t = Math.Acos(direction.Y);
 
                 double _s = (s - -Math.PI) * (1 - -1) / (Math.PI - -Math.PI) + -1;
                 double _t = (t - 0) * (1 - -1) / (Math.PI - 0) + -1;
@@ -51,10 +56,15 @@ namespace CornellBox.Models
             return imgColor;
         }
 
-        public Vector3 PlanarProjection(Vector3 position)
+        /// <summary>
+        /// Get the color from an image
+        /// </summary>
+        /// <param name="direction">Hitpoint direction</param>
+        /// <returns>Color vector</returns>
+        public Vector3 PlanarProjection(Vector3 direction)
         {
-            double s = position.X;
-            double t = position.Y;
+            double s = direction.X;
+            double t = direction.Y;
             Vector3 imgColor = GetColorFromImage(s, t);
 
             return imgColor;

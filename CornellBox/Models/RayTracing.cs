@@ -26,6 +26,12 @@ namespace CornellBox.Models
         public List<Sphere> Spheres { get => spheres; private set => spheres = value; }
         public List<LightSource> Lights { get => lights; private set => lights = value; }
 
+        /// <summary>
+        /// Calculate the color at the ray hitpoint. Iterates through a list of all spheres
+        /// </summary>
+        /// <param name="ray">ray</param>
+        /// <param name="recursionCount">current recursion count</param>
+        /// <returns>Color vector</returns>
         public Vector3 CalcColor(Ray ray, int recursionCount = 0)
         {
             Hitpoint hPoint = Hitpoint.FindClosestHitPoint(Spheres, ray);
@@ -58,6 +64,13 @@ namespace CornellBox.Models
             return I;
         }
 
+        /// <summary>
+        /// Calculate the color at the ray hitpoint. Iterates through a bounding sphere tree
+        /// </summary>
+        /// <param name="ray">ray</param>
+        /// <param name="bSphere">Bounding sphere node</param>
+        /// <param name="recursionCount">current recursion count</param>
+        /// <returns>Color vector</returns>
         public Vector3 CalcColor(Ray ray, BoundingSphere bSphere, int recursionCount = 0)
         {
             Hitpoint hPoint = Hitpoint.FindClosestHitPoint(bSphere, ray);
@@ -90,6 +103,12 @@ namespace CornellBox.Models
             return I;
         }
 
+        /// <summary>
+        /// Calculate the diffuse
+        /// </summary>
+        /// <param name="light">Lightsoruce</param>
+        /// <param name="h">Hitpoint</param>
+        /// <returns>Diffuse</returns>
         private Vector3 Diffuse(LightSource light, Hitpoint h)
         {
             Vector3 diff = Vector3.Zero;
@@ -113,6 +132,14 @@ namespace CornellBox.Models
             return diff;
         }
 
+        /// <summary>
+        /// Calculates the phong
+        /// </summary>
+        /// <param name="light">Lightsource</param>
+        /// <param name="h">hitpoint</param>
+        /// <param name="phongExp">phong exponent</param>
+        /// <param name="ray">ray</param>
+        /// <returns>phong</returns>
         private Vector3 Phong(LightSource light, Hitpoint h, int phongExp, Ray ray)
         {
             Vector3 phong = Vector3.Zero;
@@ -136,13 +163,19 @@ namespace CornellBox.Models
             return phong;
         }
 
+        /// <summary>
+        /// Calculates the shadow. Iterates through a list of all spheres
+        /// </summary>
+        /// <param name="light">Lightsource</param>
+        /// <param name="h">Hitpoint</param>
+        /// <param name="spheres">List of spheres</param>
+        /// <returns>Shadow</returns>
         private Vector3 Shadow(LightSource light, Hitpoint h, List<Sphere> spheres)
         {
             Vector3 shadow = Vector3.One;
             Vector3 hl = Vector3.Subtract(light.Position, h.Position);
 
             Ray lightRay = new Ray(h.Position + h.Normal * 0.001f, Vector3.Normalize(hl));
-
             Hitpoint shadowHitpoint = Hitpoint.FindClosestHitPoint(spheres, lightRay);
 
             if (shadowHitpoint.Sphere == null) return shadow;
@@ -155,13 +188,19 @@ namespace CornellBox.Models
             return shadow;
         }
 
+        /// <summary>
+        /// Calculates the shadow. Iterates through a bounding sphere tree
+        /// </summary>
+        /// <param name="light">Lightsource</param>
+        /// <param name="h">Hitpoint</param>
+        /// <param name="bSphere">Bounding sphere node</param>
+        /// <returns>Shadow</returns>
         private Vector3 Shadow(LightSource light, Hitpoint h, BoundingSphere bSphere)
         {
             Vector3 shadow = Vector3.One;
             Vector3 hl = Vector3.Subtract(light.Position, h.Position);
 
             Ray lightRay = new Ray(h.Position + h.Normal * 0.001f, Vector3.Normalize(hl));
-
             Hitpoint shadowHitpoint = Hitpoint.FindClosestHitPoint(bSphere, lightRay);
 
             if (shadowHitpoint.Sphere == null) return shadow;
@@ -174,6 +213,13 @@ namespace CornellBox.Models
             return shadow;
         }
 
+        /// <summary>
+        /// Calculate the reflection
+        /// </summary>
+        /// <param name="h">Hitpoint</param>
+        /// <param name="ray">Ray</param>
+        /// <param name="recursionCount">current recursion count</param>
+        /// <returns>Reflection</returns>
         private Vector3 Reflection(Hitpoint h, Ray ray, int recursionCount)
         {
             Vector3 reflection = Vector3.Zero;
@@ -196,6 +242,14 @@ namespace CornellBox.Models
             return reflection;
         }
 
+        /// <summary>
+        /// Calculate the reflection. Bounding sphere method
+        /// </summary>
+        /// <param name="h">Hitpoint</param>
+        /// <param name="ray">Ray</param>
+        /// <param name="bSphere">Bounding sphere node</param>
+        /// <param name="recursionCount">current recursion Count</param>
+        /// <returns>Reflection</returns>
         private Vector3 Reflection(Hitpoint h, Ray ray, BoundingSphere bSphere, int recursionCount)
         {
             Vector3 reflection = Vector3.Zero;

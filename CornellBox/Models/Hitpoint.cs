@@ -25,6 +25,12 @@ namespace CornellBox.Models
         public Vector3 Normal { get => normal; private set => normal = value; }
         public double Lambda { get => lambda; private set => lambda = value; }
 
+        /// <summary>
+        /// Find the closest hitpoint in the sphere list
+        /// </summary>
+        /// <param name="spheres">List of spheres</param>
+        /// <param name="ray">ray</param>
+        /// <returns>Closest hitpoint</returns>
         public static Hitpoint FindClosestHitPoint(List<Sphere> spheres, Ray ray)
         {
             double closestHit = double.MaxValue;
@@ -50,6 +56,12 @@ namespace CornellBox.Models
             return new Hitpoint(pos, closestSphere, closestHit);
         }
 
+        /// <summary>
+        /// Find closest hitpoint in the bounding sphere tree
+        /// </summary>
+        /// <param name="bSphere">Node of the bounding sphere tree</param>
+        /// <param name="ray">ray</param>
+        /// <returns>Closest hitpoint</returns>
         public static Hitpoint FindClosestHitPoint(BoundingSphere bSphere, Ray ray)
         {
             double noHit = double.MaxValue;

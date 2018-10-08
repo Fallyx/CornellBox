@@ -27,6 +27,11 @@ namespace CornellBox.Models
         public BoundingSphere RightChild { get => rightChild; private set => rightChild = value; }
         public MaterialSphere MSphere { get => mSphere; private set => mSphere = value; }
 
+        /// <summary>
+        /// Creates a bounding volume hierarchy
+        /// </summary>
+        /// <param name="spheres">List of spheres</param>
+        /// <returns>Tree with bounding volumes</returns>
         public static BoundingSphere BVH(List<Sphere> spheres)
         {
             BoundingSphere rootBVH = null;

@@ -16,7 +16,15 @@ namespace CornellBox.Models
 
         public Vector3 Origin { get => origin; private set => origin = value; }
         public Vector3 Direction { get => direction; private set => direction = value; }
-
+        
+        /// <summary>
+        /// Creates a ray from the eye
+        /// </summary>
+        /// <param name="Eye">Position of eye</param>
+        /// <param name="LookAt">Look at</param>
+        /// <param name="FOV">Field of view</param>
+        /// <param name="Pixel">Pixel in the [-1, 1] space</param>
+        /// <returns></returns>
         public static Ray CreateEyeRay(Vector3 Eye, Vector3 LookAt, double FOV, Vector2 Pixel)
         {
             double alpha = FOV * Math.PI / 180.0;
