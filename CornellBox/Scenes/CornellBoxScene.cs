@@ -65,6 +65,7 @@ namespace CornellBox.Scenes
             Ray eyeRay;
 
             RayTracing rayTracing = new RayTracing(spheres, lights);
+            Random r = new Random();
 
             for (int col = 0; col < imgWidth; col++)
             {
@@ -73,9 +74,8 @@ namespace CornellBox.Scenes
                     Vector3 color = Vector3.Zero;
                     for(int i = 0; i < AASamples; i++)
                     {
-                        Random r = new Random();
-                        double gauss1 = MathHelper.NextGaussian(r, 0.5, 0);
-                        double gauss2 = MathHelper.NextGaussian(r, 0.5, 0);
+                        double gauss1 = MathHelper.NextGaussian(r, 0, 0.5);
+                        double gauss2 = MathHelper.NextGaussian(r, 0, 0.5);
 
                         double px = ((col + gauss1) / (imgWidth - 1d)) * 2 - 1; // + gauss (0, 0.5)
                         double py = ((row + gauss2) / (imgHeight - 1d)) * 2 - 1;
@@ -106,7 +106,6 @@ namespace CornellBox.Scenes
             Ray eyeRay;
 
             RayTracing rayTracing = new RayTracing(lights);
-
             Random r = new Random();
 
             for (int col = 0; col < imgWidth; col++)
@@ -116,7 +115,6 @@ namespace CornellBox.Scenes
                     Vector3 color = Vector3.Zero;
                     for (int i = 0; i < AASamples; i++)
                     {
-                        
                         double gauss1 = MathHelper.NextGaussian(r, 0, 0.5);
                         double gauss2 = MathHelper.NextGaussian(r, 0, 0.5);
 
