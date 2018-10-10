@@ -33,7 +33,7 @@ namespace CornellBox
             InitializeComponent();
 
             spheres = CornellBoxScene.InitSphere();
-            lights = CornellBoxScene.InitLight(true);
+            lights = CornellBoxScene.InitLight(true, true);
 
             // CompositionTarget.Rendering += Render;
 

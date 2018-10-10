@@ -53,7 +53,8 @@ namespace CornellBox.Models
                 else if (mSphere.Material.HasImg) diff = mSphere.Material.SphericalProjection(hPoint.Normal);
                 else diff = mSphere.Material.Color;
                 if (recursionCount == 0 && mSphere.HasPhong) phong = Phong(light, hPoint, 40, ray);
-                if (mSphere.HasShadow) shadow = Shadow(light, hPoint, Spheres);
+                if (mSphere.HasShadow && light.Radius == 0) shadow = Shadow(light, hPoint, Spheres);
+                else if (mSphere.HasShadow) SoftShadow(light, hPoint, Spheres, 20);
 
                 I += (diff * shadow) + phong;
             }
@@ -92,7 +93,8 @@ namespace CornellBox.Models
                 else if (mSphere.Material.HasImg) diff = mSphere.Material.SphericalProjection(hPoint.Normal);
                 else diff = mSphere.Material.Color;
                 if (recursionCount == 0 && mSphere.HasPhong) phong = Phong(light, hPoint, 40, ray);
-                if (mSphere.HasShadow) shadow = Shadow(light, hPoint, bSphere);
+                if (mSphere.HasShadow && light.Radius == 0) shadow = Shadow(light, hPoint, bSphere);
+                else if (mSphere.HasShadow) shadow = SoftShadow(light, hPoint, bSphere, 10);
 
                 I += (diff * shadow) + phong;
             }
@@ -188,6 +190,20 @@ namespace CornellBox.Models
             return shadow;
         }
 
+        private Vector3 SoftShadow(LightSource light, Hitpoint h, List<Sphere> spheres, int lightSamples)
+        {
+            // Nl = Vec3Normalize(lightCenter - HitpointCenter)
+            // (Not normalized) Nx = if(Nl == Vec3(0,1,0) ) Nl Vec3cross Vec3(1,0,0) else Nl Vec3cross Vec3(0,1,0)
+            // (Normalized) Ny = Nl Vec3Cross Nx
+
+            // x = sqrt(rand(0,1)) * sin(rand(0, 2Pi)
+            // y = sqrt(rand(0,1)) * cos(rand(0, 2Pi)
+
+            // randPoint = lightCenter + lightRadius * Vec3Normalize(Nx) * x + Vec3Normalize(Ny) * y * lightRadius
+
+            return Vector3.One;
+        }
+
         /// <summary>
         /// Calculates the shadow. Iterates through a bounding sphere tree
         /// </summary>
@@ -209,6 +225,54 @@ namespace CornellBox.Models
             {
                 shadow = new Vector3(light.Color.X * 0.2f, light.Color.Y * 0.2f, light.Color.Z * 0.2f);
             }
+
+            return shadow;
+        }
+
+        private Vector3 SoftShadow(LightSource light, Hitpoint h, BoundingSphere bSphere, int lightSamples)
+        {
+            Vector3 shadow = Vector3.One;
+            int nrInShadow = 0;
+
+            // Nl = Vec3Normalize(lightCenter - HitpointCenter)
+            Vector3 Nl = Vector3.Normalize(h.Position - light.Position);
+
+            // (Not normalized) Nx = if(Nl == Vec3(0,1,0) ) Nl Vec3cross Vec3(1,0,0) else Nl Vec3cross Vec3(0,1,0)
+            Vector3 Nx = Nl == new Vector3(0, 1, 0) ? Vector3.Cross(Nl, new Vector3(1, 0, 0)) : Vector3.Cross(Nl, new Vector3(0, 1, 0));
+            Nx = Vector3.Normalize(Nx);
+            // (Normalized) Ny = Nl Vec3Cross Nx
+            Vector3 Ny = Vector3.Cross(Nl, Nx);
+
+            for (int i = 0; i < lightSamples; i++)
+            {            
+                double r = MathHelper.Rand.NextDouble();
+                double t = MathHelper.Rand.NextDouble() * 2 * Math.PI;
+                // x = sqrt(rand(0,1)) * sin(rand(0, 2Pi)
+                double x = Math.Sqrt(r) * Math.Sin(t);
+                // y = sqrt(rand(0,1)) * cos(rand(0, 2Pi)
+                double y = Math.Sqrt(r) * Math.Cos(t);
+
+                // randPoint = lightCenter + lightRadius * Vec3Normalize(Nx) * x + Vec3Normalize(Ny) * y * lightRadius
+
+                Vector3 randPoint = light.Position + (float)light.Radius * Nx * (float)x + Ny * (float)y * (float)light.Radius;
+                Vector3 hl = h.Position - randPoint;
+
+                Ray randomLightRay = new Ray(randPoint + h.Normal * 0.001f, Vector3.Normalize(hl));
+
+                Hitpoint shadowHitpoint = Hitpoint.FindClosestHitPoint(bSphere, randomLightRay);
+
+                if (shadowHitpoint.Sphere == null) return shadow;
+
+                if (shadowHitpoint.Lambda < hl.Length())
+                {
+                    nrInShadow++;
+                }
+            }
+
+            double sMultiplier = Helpers.MathHelper.RangeConverter(0, lightSamples, 0, 0.8, nrInShadow);
+            float sM = 1 - (float)sMultiplier;
+
+            shadow = new Vector3(light.Color.X * sM, light.Color.Y * sM, light.Color.Z * sM);
 
             return shadow;
         }

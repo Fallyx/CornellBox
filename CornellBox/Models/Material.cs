@@ -46,8 +46,8 @@ namespace CornellBox.Models
                 double s = Math.Atan2(direction.X, direction.Z);
                 double t = Math.Acos(direction.Y);
 
-                double _s = (s - -Math.PI) * (1 - -1) / (Math.PI - -Math.PI) + -1;
-                double _t = (t - 0) * (1 - -1) / (Math.PI - 0) + -1;
+                double _s = Helpers.MathHelper.RangeConverter(-Math.PI, Math.PI, -1, 1, s);
+                double _t = Helpers.MathHelper.RangeConverter(0, Math.PI, -1, 1, t);
                 _s *= -1;
                 _t *= -1;
 

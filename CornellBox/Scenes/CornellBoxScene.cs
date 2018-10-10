@@ -34,22 +34,25 @@ namespace CornellBox.Scenes
             return spheres;
         }
 
-        public static List<LightSource> InitLight(bool singleLight)
+        public static List<LightSource> InitLight(bool singleLight, bool hasRadius)
         {
             List<LightSource> lights = new List<LightSource>();
             LightSource WhiteLight;
 
+            double radius = hasRadius ? 0.3 : 0;
+
+
             if (singleLight)
             {
-                WhiteLight = new LightSource(new Vector3(0, -0.9f, 0), new Vector3(1f, 1f, 1f));
+                WhiteLight = new LightSource(new Vector3(0, -0.9f, 0), new Vector3(1f, 1f, 1f), radius);
                 lights.Add(WhiteLight);
 
                 return lights;
             }
 
-            WhiteLight = new LightSource(new Vector3(0, -0.9f, 0), new Vector3(0.5f, 0.5f, 0.5f));
-            LightSource MagentaLight = new LightSource(new Vector3(-0.8f, -0.9f, 0), new Vector3(0.5f, 0f, 0.5f));
-            LightSource YellowLight = new LightSource(new Vector3(0.8f, -0.9f, 0), new Vector3(0.5f, 0.5f, 0f));
+            WhiteLight = new LightSource(new Vector3(0, -0.9f, 0), new Vector3(0.5f, 0.5f, 0.5f), radius);
+            LightSource MagentaLight = new LightSource(new Vector3(-0.8f, -0.9f, 0), new Vector3(0.5f, 0f, 0.5f), radius);
+            LightSource YellowLight = new LightSource(new Vector3(0.8f, -0.9f, 0), new Vector3(0.5f, 0.5f, 0f), radius);
 
             lights.Add(WhiteLight);
             lights.Add(MagentaLight);
@@ -78,7 +81,7 @@ namespace CornellBox.Scenes
                     {
                         for (int i = 0; i < AASamples; i++)
                         {
-                            eyeRay = Ray.CreateEyeRay(Eye, LookAt, FOV, GaussDomainPixels(col, row, imgWidth, imgHeight, r));
+                            eyeRay = Ray.CreateEyeRay(Eye, LookAt, FOV, GaussDomainPixels(col, row, imgWidth, imgHeight));
                             color += rayTracing.CalcColor(eyeRay);
                         }
 
@@ -112,7 +115,6 @@ namespace CornellBox.Scenes
             Ray eyeRay;
 
             RayTracing rayTracing = new RayTracing(lights);
-            Random r = new Random();
 
             for (int col = 0; col < imgWidth; col++)
             {
@@ -125,7 +127,7 @@ namespace CornellBox.Scenes
                     {
                         for (int i = 0; i < AASamples; i++)
                         {
-                            eyeRay = Ray.CreateEyeRay(Eye, LookAt, FOV, GaussDomainPixels(col, row, imgWidth, imgHeight, r));
+                            eyeRay = Ray.CreateEyeRay(Eye, LookAt, FOV, GaussDomainPixels(col, row, imgWidth, imgHeight));
                             color += rayTracing.CalcColor(eyeRay, bSphere);
                         }
 
@@ -152,10 +154,10 @@ namespace CornellBox.Scenes
             return pixels;
         }
 
-        private static Vector2 GaussDomainPixels(int col, int row, int imgWidth, int imgHeight, Random r)
+        private static Vector2 GaussDomainPixels(int col, int row, int imgWidth, int imgHeight)
         {
-            double gauss1 = MathHelper.NextGaussian(r, 0, 0.3);
-            double gauss2 = MathHelper.NextGaussian(r, 0, 0.3);
+            double gauss1 = MathHelper.NextGaussian(0, 0.3);
+            double gauss2 = MathHelper.NextGaussian(0, 0.3);
 
             double px = ((col + gauss1) / (imgWidth - 1d)) * 2 - 1;
             double py = ((row + gauss2) / (imgHeight - 1d)) * 2 - 1;
