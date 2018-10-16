@@ -255,9 +255,9 @@ namespace CornellBox.Models
                 // randPoint = lightCenter + lightRadius * Vec3Normalize(Nx) * x + Vec3Normalize(Ny) * y * lightRadius
 
                 Vector3 randPoint = light.Position + (float)light.Radius * Nx * (float)x + Ny * (float)y * (float)light.Radius;
-                Vector3 hl = h.Position - randPoint;
+                Vector3 hl = randPoint - h.Position;
 
-                Ray randomLightRay = new Ray(randPoint + h.Normal * 0.001f, Vector3.Normalize(hl));
+                Ray randomLightRay = new Ray(h.Position + h.Normal * 0.001f, Vector3.Normalize(hl));
 
                 Hitpoint shadowHitpoint = Hitpoint.FindClosestHitPoint(bSphere, randomLightRay);
 
@@ -269,7 +269,7 @@ namespace CornellBox.Models
                 }
             }
 
-            double sMultiplier = Helpers.MathHelper.RangeConverter(0, lightSamples, 0, 0.8, nrInShadow);
+            double sMultiplier = nrInShadow != 0 ? Helpers.MathHelper.RangeConverter(0, lightSamples, 0, 0.8, nrInShadow) : 0;
             float sM = 1 - (float)sMultiplier;
 
             shadow = new Vector3(light.Color.X * sM, light.Color.Y * sM, light.Color.Z * sM);
