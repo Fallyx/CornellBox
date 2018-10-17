@@ -34,6 +34,31 @@ namespace CornellBox.Scenes
             return spheres;
         }
 
+        public static List<Sphere> InitEmissiveSphere()
+        {
+            List<Sphere> spheres = new List<Sphere>();
+
+            Sphere aRed = new MaterialSphere(new Vector3(-1001, 0, 0), 1000, new Material(new Vector3(0, 0, 1)));
+            Sphere bBlue = new MaterialSphere(new Vector3(1001, 0, 0), 1000, new Material(new Vector3(1, 0, 0)));
+            Sphere cWhite = new MaterialSphere(new Vector3(0, 0, 1001), 1000, new Material(new Vector3(1, 1, 1)));
+            Sphere dWhite = new MaterialSphere(new Vector3(0, -1001, 0), 1000, new Material(new Vector3(1, 1, 1)));
+            Sphere eWhite = new MaterialSphere(new Vector3(0, 1001, 0), 1000, new Material(new Vector3(1, 1, 1)));
+            Sphere fYellow = new MaterialSphere(new Vector3(-0.6f, 0.7f, -0.6f), 0.3, new Material(new Vector3(0, 1, 1)));
+            Sphere gCyan = new MaterialSphere(new Vector3(0.3f, 0.4f, 0.3f), 0.6, new Material(new Vector3(1, 1, 0.88f)));
+            Sphere wLight = new MaterialSphere(new Vector3(0, -10.99f, 0), 10, new Material(new Vector3(1, 1, 1), emission: 1f));
+
+            spheres.Add(aRed);
+            spheres.Add(bBlue);
+            spheres.Add(cWhite);
+            spheres.Add(dWhite);
+            spheres.Add(eWhite);
+            spheres.Add(fYellow);
+            spheres.Add(gCyan);
+            spheres.Add(wLight);
+
+            return spheres;
+        }
+
         public static List<LightSource> InitLight(bool singleLight, bool hasRadius)
         {
             List<LightSource> lights = new List<LightSource>();
@@ -59,22 +84,6 @@ namespace CornellBox.Scenes
             lights.Add(YellowLight);
 
             return lights;
-        }
-
-        /// <summary>
-        /// Path tracing pixel color calculation
-        /// </summary>
-        /// <param name="imgHeight"></param>
-        /// <param name="imgWidth"></param>
-        /// <param name="stride"></param>
-        /// <param name="bSphere"></param>
-        /// <param name="eye"></param>
-        /// <param name="lookAt"></param>
-        /// <param name="FOV"></param>
-        /// <returns></returns>
-        public static byte[] PixelArray(int imgHeight, int imgWidth, int stride, BoundingSphere bSphere, Vector3 eye, Vector3 lookAt, double FOV)
-        {
-            return null;
         }
 
         /// <summary>
@@ -123,6 +132,42 @@ namespace CornellBox.Scenes
                         finalColor = color;
                     }
                     
+                    Color c = Color.FromScRgb(1, finalColor.Z, finalColor.Y, finalColor.X);
+
+                    pixels[index++] = c.B;
+                    pixels[index++] = c.G;
+                    pixels[index++] = c.R;
+
+                    index++; // Skip Alpha
+                }
+            }
+
+            return pixels;
+        }
+
+        public static byte[] PixelArray(int imgHeight, int imgWidth, int stride, BoundingSphere bSphere, Vector3 eye, Vector3 lookAt, double FOV, int AASamples)
+        {
+            byte[] pixels = new byte[imgHeight * imgWidth * stride];
+            int index = 0;
+            Ray eyeRay;
+
+            PathTracing pathTracing = new PathTracing();
+
+            for (int col = 0; col < imgWidth; col++)
+            {
+                for (int row = 0; row < imgHeight; row++)
+                {
+                    Vector3 color = Vector3.Zero;
+                    Vector3 finalColor = Vector3.Zero;
+
+                    for (int i = 0; i < AASamples; i++)
+                    {
+                        eyeRay = Ray.CreateEyeRay(eye, lookAt, FOV, GaussDomainPixels(col, row, imgWidth, imgHeight));
+                        color += pathTracing.CalcColor(eyeRay, bSphere);
+                    }
+
+                    finalColor = new Vector3(color.X / (float) AASamples, color.Y / (float) AASamples, color.Z / (float) AASamples);
+
                     Color c = Color.FromScRgb(1, finalColor.Z, finalColor.Y, finalColor.X);
 
                     pixels[index++] = c.B;
