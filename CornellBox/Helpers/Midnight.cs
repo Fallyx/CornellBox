@@ -6,18 +6,6 @@ namespace CornellBox.Helpers
 {
     class Midnight
     {
-        public static float[] MidnightVars(Sphere sphere, Ray ray)
-        {
-            float[] mVars = new float[3];
-
-            Vector3 sr = Vector3.Subtract(ray.Origin, sphere.Center);
-            mVars[0] = 1; // a
-            mVars[1] = 2 * Vector3.Dot(sr, Vector3.Normalize(ray.Direction)); // b
-            mVars[2] = (float)(sr.Length() * sr.Length() - sphere.Radius * sphere.Radius); // c
-
-            return mVars;
-        }
-
         public static float[] MidnightVars(BoundingSphere bSphere, Ray ray)
         {
             float[] mVars = new float[3];

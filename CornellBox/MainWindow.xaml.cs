@@ -54,7 +54,6 @@ namespace CornellBox
 
         private void Render()
         {
-            //byte[] pixels1d = CornellBoxScene.PixelArray(imgHeight, imgWidth, 4, spheres, lights, Eye, LookAt, FOV, 10);
             byte[] pixels1d = CornellBoxScene.PixelArray(imgHeight, imgWidth, 4, bvh, lights, Eye, LookAt, FOV, 10);
 
             Int32Rect rect = new Int32Rect(0, 0, imgWidth, imgHeight);            

@@ -8,6 +8,7 @@ namespace CornellBox.Models
     {
         private Vector3 color;
         private float reflection;
+        private float emission;
         private string imgPath;
         private bool hasImg;
         private Bitmap img;
@@ -15,10 +16,11 @@ namespace CornellBox.Models
 
         private static string rootPath = System.IO.Path.GetDirectoryName(System.Reflection.Assembly.GetEntryAssembly().Location);
 
-        public Material(Vector3 color, float reflection = 0, string imgPath = null, Vector2 offset = new Vector2())
+        public Material(Vector3 color, float reflection = 0, float emission = 0, string imgPath = null, Vector2 offset = new Vector2())
         {
             Color = color;
             Reflection = reflection;
+            Emission = emission;
             ImgPath = imgPath;
             HasImg = String.IsNullOrEmpty(imgPath) ? false : true;
             Img = String.IsNullOrEmpty(imgPath) ? null : new Bitmap(imgPath);
@@ -27,6 +29,7 @@ namespace CornellBox.Models
 
         public Vector3 Color { get => color; private set => color = value; }
         public float Reflection { get => reflection; private set => reflection = value; }
+        public float Emission { get => emission; set => emission = value; }
         public string ImgPath { get => imgPath; set => imgPath = value; }
         public bool HasImg { get => hasImg; private set => hasImg = value; }
         public Bitmap Img { get => img; set => img = value; }

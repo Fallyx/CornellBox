@@ -26,37 +26,6 @@ namespace CornellBox.Models
         public double Lambda { get => lambda; private set => lambda = value; }
 
         /// <summary>
-        /// Find the closest hitpoint in the sphere list
-        /// </summary>
-        /// <param name="spheres">List of spheres</param>
-        /// <param name="ray">ray</param>
-        /// <returns>Closest hitpoint</returns>
-        public static Hitpoint FindClosestHitPoint(List<Sphere> spheres, Ray ray)
-        {
-            double closestHit = double.MaxValue;
-            Sphere closestSphere = null;
-
-            foreach (Sphere sphere in spheres)
-            {
-                float[] mVars = Midnight.MidnightVars(sphere, ray);
-
-                if (mVars[1] * mVars[1] > 4 * mVars[0] * mVars[2])
-                {
-                    double lambda = Midnight.CalcLambda(mVars[0], mVars[1], mVars[2]);
-
-                    closestHit = Math.Min(closestHit, lambda);
-                    if(closestHit == lambda)
-                    {
-                        closestSphere = sphere;
-                    }
-                }
-            }
-
-            Vector3 pos = new Vector3((float)(ray.Origin.X + closestHit * ray.Direction.X), (float)(ray.Origin.Y + closestHit * ray.Direction.Y), (float)(ray.Origin.Z + closestHit * ray.Direction.Z));
-            return new Hitpoint(pos, closestSphere, closestHit);
-        }
-
-        /// <summary>
         /// Find closest hitpoint in the bounding sphere tree
         /// </summary>
         /// <param name="bSphere">Node of the bounding sphere tree</param>

@@ -20,7 +20,7 @@ namespace CornellBox.Scenes
             Sphere eWhite = new MaterialSphere(new Vector3(0, 1001, 0), 1000, new Material(new Vector3(1, 1, 1)));
             //Sphere fYellow = new MaterialSphere(new Vector3(-0.6f, 0.7f, -0.6f), 0.3, new Material(new Vector3(0, 1, 1), 0.5f));
             //Sphere gCyan = new MaterialSphere(new Vector3(0.3f, 0.4f, 0.3f), 0.6, new Material(new Vector3(1, 1, 0.88f), 0.5f));
-            Sphere fYellow = new MaterialSphere(new Vector3(-0.6f, 0.7f, -0.6f), 0.3, new Material(new Vector3(0, 1, 1), 0.5f, Material.BrickImage()));
+            Sphere fYellow = new MaterialSphere(new Vector3(-0.6f, 0.7f, -0.6f), 0.3, new Material(new Vector3(0, 1, 1), 0.5f, 0, Material.BrickImage()));
             Sphere gCyan = new MaterialSphere(new Vector3(0.3f, 0.4f, 0.3f), 0.6, new Material(new Vector3(1, 1, 0.88f), imgPath: Material.EarthImage(), offset: new Vector2(0.5f, 0)),false, false,false, false);
 
             spheres.Add(aRed);
@@ -60,55 +60,37 @@ namespace CornellBox.Scenes
 
             return lights;
         }
-        
-        public static byte[] PixelArray(int imgHeight, int imgWidth, int stride, List<Sphere> spheres, List<LightSource> lights, Vector3 Eye, Vector3 LookAt, double FOV, int AASamples = 0)
+
+        /// <summary>
+        /// Path tracing pixel color calculation
+        /// </summary>
+        /// <param name="imgHeight"></param>
+        /// <param name="imgWidth"></param>
+        /// <param name="stride"></param>
+        /// <param name="bSphere"></param>
+        /// <param name="eye"></param>
+        /// <param name="lookAt"></param>
+        /// <param name="FOV"></param>
+        /// <returns></returns>
+        public static byte[] PixelArray(int imgHeight, int imgWidth, int stride, BoundingSphere bSphere, Vector3 eye, Vector3 lookAt, double FOV)
         {
-            byte[] pixels = new byte[imgHeight * imgWidth * stride];
-            int index = 0;
-            Ray eyeRay;
-
-            RayTracing rayTracing = new RayTracing(spheres, lights);
-            Random r = new Random();
-
-            for (int col = 0; col < imgWidth; col++)
-            {
-                for (int row = 0; row < imgHeight; row++)
-                {
-                    Vector3 color = Vector3.Zero;
-                    Vector3 finalColor = Vector3.Zero;
-
-                    if(AASamples != 0)
-                    {
-                        for (int i = 0; i < AASamples; i++)
-                        {
-                            eyeRay = Ray.CreateEyeRay(Eye, LookAt, FOV, GaussDomainPixels(col, row, imgWidth, imgHeight));
-                            color += rayTracing.CalcColor(eyeRay);
-                        }
-
-                        finalColor = new Vector3(color.X / (float)AASamples, color.Y / (float)AASamples, color.Z / (float)AASamples);
-                    }
-                    else
-                    {
-                        eyeRay = Ray.CreateEyeRay(Eye, LookAt, FOV, DomainPixels(col, row, imgWidth, imgHeight));
-                        color = rayTracing.CalcColor(eyeRay);
-
-                        finalColor = color;
-                    }
-
-                    Color c = Color.FromScRgb(1, finalColor.Z, finalColor.Y, finalColor.X);
-
-                    pixels[index++] = c.B;
-                    pixels[index++] = c.G;
-                    pixels[index++] = c.R;
-
-                    index++; // Skip Alpha
-                }
-            }
-
-            return pixels;
+            return null;
         }
 
-        public static byte[] PixelArray(int imgHeight, int imgWidth, int stride, BoundingSphere bSphere, List<LightSource> lights, Vector3 Eye, Vector3 LookAt, double FOV, int AASamples = 0)
+        /// <summary>
+        /// Ray tracing pixel color calculation
+        /// </summary>
+        /// <param name="imgHeight"></param>
+        /// <param name="imgWidth"></param>
+        /// <param name="stride"></param>
+        /// <param name="bSphere"></param>
+        /// <param name="lights"></param>
+        /// <param name="eye"></param>
+        /// <param name="lookAt"></param>
+        /// <param name="FOV"></param>
+        /// <param name="AASamples"></param>
+        /// <returns></returns>
+        public static byte[] PixelArray(int imgHeight, int imgWidth, int stride, BoundingSphere bSphere, List<LightSource> lights, Vector3 eye, Vector3 lookAt, double FOV, int AASamples = 0)
         {
             byte[] pixels = new byte[imgHeight * imgWidth * stride];
             int index = 0;
@@ -127,7 +109,7 @@ namespace CornellBox.Scenes
                     {
                         for (int i = 0; i < AASamples; i++)
                         {
-                            eyeRay = Ray.CreateEyeRay(Eye, LookAt, FOV, GaussDomainPixels(col, row, imgWidth, imgHeight));
+                            eyeRay = Ray.CreateEyeRay(eye, lookAt, FOV, GaussDomainPixels(col, row, imgWidth, imgHeight));
                             color += rayTracing.CalcColor(eyeRay, bSphere);
                         }
 
@@ -135,7 +117,7 @@ namespace CornellBox.Scenes
                     }
                     else
                     {
-                        eyeRay = Ray.CreateEyeRay(Eye, LookAt, FOV, DomainPixels(col, row, imgWidth, imgHeight));
+                        eyeRay = Ray.CreateEyeRay(eye, lookAt, FOV, DomainPixels(col, row, imgWidth, imgHeight));
                         color = rayTracing.CalcColor(eyeRay, bSphere);
 
                         finalColor = color;
