@@ -32,7 +32,7 @@ namespace CornellBox
         {
             InitializeComponent();
 
-            lights = CornellBoxScene.InitLight(true, true); // Ray / Path tracing lights
+            lights = CornellBoxScene.InitLight(true, true); // Ray tracing lights
             spheres = CornellBoxScene.InitSphere(); // Ray tracing spheres
             //spheres = CornellBoxScene.InitEmissiveSphere(); // Path tracing spheres
             //lights = CornellBoxScene.InitBVHLight(Eye); // BVH Light
@@ -58,7 +58,7 @@ namespace CornellBox
         private void Render()
         {
             byte[] pixels1d = CornellBoxScene.PixelArray(imgHeight, imgWidth, 4, bvh, lights, Eye, LookAt, FOV, 20);
-            //byte[] pixels1d = CornellBoxScene.PixelArray(imgHeight, imgWidth, 4, bvh, Eye, LookAt, FOV, 128);
+            //byte[] pixels1d = CornellBoxScene.PixelArray(imgHeight, imgWidth, 4, bvh, Eye, LookAt, FOV, 8);
 
             Int32Rect rect = new Int32Rect(0, 0, imgWidth, imgHeight);            
             wbmap.WritePixels(rect, pixels1d, stride, 0);
