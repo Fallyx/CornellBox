@@ -34,6 +34,31 @@ namespace CornellBox.Scenes
             return spheres;
         }
 
+        public static List<Sphere> InitBVHSphere()
+        {
+            List<Sphere> spheres = new List<Sphere>();
+
+            Sphere cWhite = new MaterialSphere(new Vector3(0, 0, 1001), 1000, new Material(new Vector3(0, 0, 0)));
+            spheres.Add(cWhite);
+
+            for (int i = 0; i < 500; i++)
+            {
+                double x = MathHelper.Rand.NextDouble() * 2 - 1;
+                double y = MathHelper.Rand.NextDouble() * 2 - 1;
+                double z = MathHelper.Rand.NextDouble() * 2 - 1;
+
+                double r = MathHelper.Rand.NextDouble();
+                double g = MathHelper.Rand.NextDouble();
+                double b = MathHelper.Rand.NextDouble();
+
+                Sphere s = new MaterialSphere(new Vector3((float)x, (float)y, (float)z), 0.1, new Material(new Vector3((float)b, (float)g, (float)r)));
+
+                spheres.Add(s);
+            }
+
+            return spheres;
+        }
+
         public static List<Sphere> InitEmissiveSphere()
         {
             List<Sphere> spheres = new List<Sphere>();
@@ -82,6 +107,16 @@ namespace CornellBox.Scenes
             lights.Add(WhiteLight);
             lights.Add(MagentaLight);
             lights.Add(YellowLight);
+
+            return lights;
+        }
+
+        public static List<LightSource> InitBVHLight(Vector3 pos)
+        {
+            List<LightSource> lights = new List<LightSource>();
+
+            LightSource light = new LightSource(pos, new Vector3(0.5f, 0.5f, 0.5f));
+            lights.Add(light);
 
             return lights;
         }

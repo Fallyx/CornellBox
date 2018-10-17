@@ -12,6 +12,7 @@ namespace CornellBox.Helpers
 
         public static Random Rand { get => r; }
 
+        // https://bitbucket.org/Superbest/superbest-random/src/f067e1dc014c31be62c5280ee16544381e04e303/Superbest%20random/RandomExtensions.cs
         public static double NextGaussian(double mu = 0, double sigma = 1)
         {
             var u1 = Rand.NextDouble();

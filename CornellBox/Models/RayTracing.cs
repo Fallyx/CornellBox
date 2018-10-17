@@ -168,7 +168,7 @@ namespace CornellBox.Models
 
                 Hitpoint shadowHitpoint = Hitpoint.FindClosestHitPoint(bSphere, randomLightRay);
 
-                if (shadowHitpoint.Sphere == null) return shadow;
+                if (shadowHitpoint == null || shadowHitpoint.Sphere == null) return shadow;
 
                 if (shadowHitpoint.Lambda < hl.Length())
                 {

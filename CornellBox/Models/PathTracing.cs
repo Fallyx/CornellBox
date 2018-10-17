@@ -29,7 +29,7 @@ namespace CornellBox.Models
 
             Hitpoint hPoint = Hitpoint.FindClosestHitPoint(bSphere, ray);
 
-            if (hPoint.Sphere == null || hPoint == null) return Vector3.Zero;
+            if (hPoint == null || hPoint.Sphere == null) return Vector3.Zero;
 
             Vector3 color = Vector3.Zero;
             MaterialSphere mSphere = hPoint.Sphere as MaterialSphere;
