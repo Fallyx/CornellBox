@@ -22,25 +22,11 @@ namespace CornellBox
         Vector3 Eye = new Vector3(0, 0, -4);
         Vector3 LookAt = new Vector3(0, 0, 6);     
 
-        List<Sphere> spheres = new List<Sphere>();
-        List<LightSource> lights = new List<LightSource>();
-        BoundingSphere bvh;
-
         WriteableBitmap wbmap;
 
         public MainWindow()
         {
             InitializeComponent();
-
-            lights = CornellBoxScene.InitLight(true, true); // Ray tracing lights
-            spheres = CornellBoxScene.InitSphere(); // Ray tracing spheres
-            //spheres = CornellBoxScene.InitEmissiveSphere(); // Path tracing spheres
-            //lights = CornellBoxScene.InitBVHLight(Eye); // BVH Light
-            //spheres = CornellBoxScene.InitBVHSphere(); // BVH spheres
-
-            // CompositionTarget.Rendering += Render;
-
-            bvh = BoundingSphere.BVH(spheres);
 
             wbmap = new WriteableBitmap(
                 imgWidth,
@@ -52,15 +38,44 @@ namespace CornellBox
 
             cornellBoxImg.Source = wbmap;
 
-            Render();
+            RenderPathTracing();
         }
 
-        private void Render()
+        private void RenderRayTracing()
         {
-            byte[] pixels1d = CornellBoxScene.PixelArray(imgHeight, imgWidth, 4, bvh, lights, Eye, LookAt, FOV, 20);
-            //byte[] pixels1d = CornellBoxScene.PixelArray(imgHeight, imgWidth, 4, bvh, Eye, LookAt, FOV, 8);
+            List<LightSource> lights = CornellBoxScene.InitLight(true, true); // Ray tracing lights
+            List<Sphere> spheres = CornellBoxScene.InitSphere(); // Ray tracing spheres
+            BoundingSphere bvh = BoundingSphere.BVH(spheres);
 
-            Int32Rect rect = new Int32Rect(0, 0, imgWidth, imgHeight);            
+            byte[] pixels1d = CornellBoxScene.PixelArray(imgHeight, imgWidth, 4, bvh, lights, Eye, LookAt, FOV, 20);
+
+            Render(pixels1d);
+        }
+
+        private void RenderPathTracing()
+        {
+            List<Sphere> spheres = CornellBoxScene.InitEmissiveSphere(); // Path tracing spheres
+            BoundingSphere bvh = BoundingSphere.BVH(spheres);
+
+            byte[] pixels1d = CornellBoxScene.PixelArray(imgHeight, imgWidth, 4, bvh, Eye, LookAt, FOV, 8);
+
+            Render(pixels1d);
+        }
+
+        private void RenderBVH()
+        {
+            List<LightSource> lights = CornellBoxScene.InitBVHLight(Eye); // BVH Light
+            List<Sphere> spheres = CornellBoxScene.InitBVHSphere(); // BVH spheres
+            BoundingSphere bvh = BoundingSphere.BVH(spheres);
+
+            byte[] pixels1d = CornellBoxScene.PixelArray(imgHeight, imgWidth, 4, bvh, lights, Eye, LookAt, FOV);
+
+            Render(pixels1d);
+        }
+
+        private void Render(byte[] pixels1d)
+        {
+            Int32Rect rect = new Int32Rect(0, 0, imgWidth, imgHeight);
             wbmap.WritePixels(rect, pixels1d, stride, 0);
         }
     }
