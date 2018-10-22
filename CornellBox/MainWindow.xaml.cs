@@ -18,6 +18,7 @@ namespace CornellBox
         const int imgHeight = 770;
         const int stride = 4 * imgWidth;
         const double FOV = 36;
+        const int AASamples = 8;
 
         Vector3 Eye = new Vector3(0, 0, -4);
         Vector3 LookAt = new Vector3(0, 0, 6);     
@@ -47,7 +48,7 @@ namespace CornellBox
             List<Sphere> spheres = CornellBoxScene.InitSphere(); // Ray tracing spheres
             BoundingSphere bvh = BoundingSphere.BVH(spheres);
 
-            byte[] pixels1d = CornellBoxScene.PixelArray(imgHeight, imgWidth, 4, bvh, lights, Eye, LookAt, FOV, 20);
+            byte[] pixels1d = CornellBoxScene.PixelArray(imgHeight, imgWidth, 4, bvh, lights, Eye, LookAt, FOV, AASamples);
 
             Render(pixels1d);
         }
@@ -57,7 +58,7 @@ namespace CornellBox
             List<Sphere> spheres = CornellBoxScene.InitEmissiveSphere(); // Path tracing spheres
             BoundingSphere bvh = BoundingSphere.BVH(spheres);
 
-            byte[] pixels1d = CornellBoxScene.PixelArray(imgHeight, imgWidth, 4, bvh, Eye, LookAt, FOV, 8);
+            byte[] pixels1d = CornellBoxScene.PixelArray(imgHeight, imgWidth, 4, bvh, Eye, LookAt, FOV, AASamples);
 
             Render(pixels1d);
         }

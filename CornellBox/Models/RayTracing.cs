@@ -8,6 +8,7 @@ namespace CornellBox.Models
     public class RayTracing
     {
         const int MAX_RECURSION = 1;
+        const int LightSamples = 10;
 
         private List<LightSource> lights;
 
@@ -47,7 +48,7 @@ namespace CornellBox.Models
                 else diff = mSphere.Material.Color;
                 if (recursionCount == 0 && mSphere.HasPhong) phong = Phong(light, hPoint, 40, ray);
                 if (mSphere.HasShadow && light.Radius == 0) shadow = Shadow(light, hPoint, bSphere);
-                else if (mSphere.HasShadow) shadow = SoftShadow(light, hPoint, bSphere, 10);
+                else if (mSphere.HasShadow) shadow = SoftShadow(light, hPoint, bSphere, LightSamples);
 
                 I += (diff * shadow) + phong;
             }
