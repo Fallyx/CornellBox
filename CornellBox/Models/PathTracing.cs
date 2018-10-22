@@ -17,7 +17,7 @@ namespace CornellBox.Models
         public Vector3 CalcColor(Ray ray, BoundingSphere bSphere)
         {
             Vector3 color = MonteCarloCalcColor(ray, bSphere);
-            color *= (float)(1 / (1 - 0.2));
+            //color *= (float)(1 / (1 - 0.2));
 
             return color;
         }
@@ -25,7 +25,7 @@ namespace CornellBox.Models
         private Vector3 MonteCarloCalcColor(Ray ray, BoundingSphere bSphere, int recursion_count = 0)
         {
             if (recursion_count > MAX_RECURSION) return Vector3.Zero;
-            if (MathHelper.Rand.NextDouble() < 0.2) return Vector3.Zero;
+            //if (MathHelper.Rand.NextDouble() < 0.2) return Vector3.Zero;
 
             Hitpoint hPoint = Hitpoint.FindClosestHitPoint(bSphere, ray);
 

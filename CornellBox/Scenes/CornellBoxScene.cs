@@ -84,6 +84,30 @@ namespace CornellBox.Scenes
             return spheres;
         }
 
+        public static List<Sphere> InitDOFSphere()
+        {
+            List<Sphere> spheres = new List<Sphere>();
+
+            Sphere aBlue = new MaterialSphere(new Vector3(0, 0, -2), 0.3, new Material(new Vector3(1, 0, 0), 0.5f));
+            Sphere bPurlpe = new MaterialSphere(new Vector3(0, 0, -1), 0.3, new Material(new Vector3(0.95f, 0.25f, 0.64f), 0.5f));
+            Sphere cOrange = new MaterialSphere(new Vector3(0, 0, 0), 0.3, new Material(new Vector3(0.25f, 0.69f, 0.95f), 0.5f));
+            Sphere dLime = new MaterialSphere(new Vector3(0, 0, 1), 0.3, new Material(new Vector3(0.25f, 0.95f, 0.72f), 0.5f));
+            Sphere eCyan = new MaterialSphere(new Vector3(0, 0, 2), 0.3, new Material(new Vector3(0.77f, 0.95f, 0.25f), 0.5f));
+            Sphere fRed = new MaterialSphere(new Vector3(0, 0, 3), 0.3, new Material(new Vector3(0.25f, 0.25f, 0.95f), 0.5f));
+
+            Sphere gWall = new MaterialSphere(new Vector3(0, 0, 1001), 1000, new Material(new Vector3(0.89f, 0.89f, 0.89f)));
+            Sphere hWall = new MaterialSphere(new Vector3(0, 1001, 0), 1000, new Material(new Vector3(0.89f, 0.89f, 0.89f)));
+
+            spheres.Add(aBlue);
+            spheres.Add(bPurlpe);
+            spheres.Add(cOrange);
+            spheres.Add(dLime);
+            spheres.Add(eCyan);
+            spheres.Add(fRed);
+
+            return spheres;
+        }
+
         public static List<LightSource> InitLight(bool singleLight, bool hasRadius)
         {
             List<LightSource> lights = new List<LightSource>();

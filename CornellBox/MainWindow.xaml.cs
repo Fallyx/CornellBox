@@ -73,6 +73,17 @@ namespace CornellBox
             Render(pixels1d);
         }
 
+        private void RenderDOF()
+        {
+            List<LightSource> lights = CornellBoxScene.InitBVHLight(new Vector3(0.5f, 0.5f, -4));
+            List<Sphere> spheres = CornellBoxScene.InitDOFSphere();
+            BoundingSphere bvh = BoundingSphere.BVH(spheres);
+
+            byte[] pixels1d = CornellBoxScene.PixelArray(imgHeight, imgWidth, 4, bvh, lights, Eye, LookAt, FOV);
+
+            Render(pixels1d);
+        }
+
         private void Render(byte[] pixels1d)
         {
             Int32Rect rect = new Int32Rect(0, 0, imgWidth, imgHeight);
